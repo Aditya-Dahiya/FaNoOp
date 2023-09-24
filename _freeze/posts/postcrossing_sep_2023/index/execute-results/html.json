@@ -1,0 +1,14 @@
+{
+  "hash": "a108c4d4f9f9065ed66a06e4598c248b",
+  "result": {
+    "markdown": "---\ntitle: \"Postcrossing by the Numbers: Discovering the Global Postcard Exchange\"\nauthor: \"Aditya Dahiya\"\ndate: \"2023-09-24\"\ncategories: [analysis]\nimage: \"logo.png\"\neditor_options: \n  chunk_output_type: console\nexecute: \n  echo: false\n  error: false\n  message: false\n  warning: false\n---\n\n\nHey there, data explorers and globe-trotters of knowledge! Welcome to another exciting expedition into the world of data on FaNoOp. Today, we're embarking on a journey through the captivating realm of [**Postcrossing.com**](https://www.postcrossing.com/) -- the global hub where postcards find their way to far-flung corners of the Earth.\n\nEver wondered who's behind those postcards, where they're coming from, and what tales they carry? We're about to dive headfirst into a treasure trove of statistics that will reveal who the *Postcrossing community* truly is.\n\n\n::: {.cell}\n\n:::\n",
+    "supporting": [],
+    "filters": [
+      "rmarkdown/pagebreak.lua"
+    ],
+    "includes": {},
+    "engineDependencies": {},
+    "preserve": {},
+    "postProcess": true
+  }
+}

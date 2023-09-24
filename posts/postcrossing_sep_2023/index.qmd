@@ -1,13 +1,48 @@
 ---
-title: "Post With Code"
-author: "Harlow Malloc"
+title: "Postcrossing by the Numbers: Discovering the Global Postcard Exchange"
+author: "Aditya Dahiya"
 date: "2023-09-24"
-categories: [news, code, analysis]
-image: "image.jpg"
+categories: [analysis]
+image: "logo.png"
+editor_options: 
+  chunk_output_type: console
+execute: 
+  echo: false
+  error: false
+  message: false
+  warning: false
 ---
 
-This is a post with executable code.
+Hey there, data explorers and globe-trotters of knowledge! Welcome to another exciting expedition into the world of data on FaNoOp. Today, we're embarking on a journey through the captivating realm of [**Postcrossing.com**](https://www.postcrossing.com/) -- the global hub where postcards find their way to far-flung corners of the Earth.
+
+Ever wondered who's behind those postcards, where they're coming from, and what tales they carry? We're about to dive headfirst into a treasure trove of statistics that will reveal who the *Postcrossing community* truly is.
 
 ```{r}
-1 + 1
+#| label: setup
+
+library(tidyverse)
+library(janitor)
+library(gt)
+library(gtExtras)
+library(ggthemes)
+
+cps = read_csv("countries_postcrossing.csv")
+wb_countries = read_csv("countries_data_from_world_bank.csv", 
+    col_types = cols(Value_2022 = col_double()))
+
+ind_names = wb_countries |> 
+  distinct(`Indicator Name`, `Indicator Code`) |>
+  pivot_wider(names_from = `Indicator Code`,
+              values_from = `Indicator Name`) |>
+  clean_names()
+
+wb_countries = wb_countries |>
+  clean_names() |>
+  select(-indicator_name, -country_code) |>
+  pivot_wider(id_cols = country_name,
+              names_from = indicator_code,
+              values_from = value_2022) |>
+  clean_names()
+
+
 ```

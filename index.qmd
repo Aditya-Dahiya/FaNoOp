@@ -1,5 +1,7 @@
 ---
 title: "FaNoOp"
+subtitle: "Facts! Not Opinions!"
+author: "Aditya Dahiya"
 listing:
   contents: posts
   sort: "date desc"

@@ -4,7 +4,7 @@
     "href": "index.html",
     "title": "FaNoOp",
     "section": "",
-    "text": "Post With Code\n\n\n\n\n\n\n\nnews\n\n\ncode\n\n\nanalysis\n\n\n\n\n\n\n\n\n\n\n\nSep 24, 2023\n\n\nHarlow Malloc\n\n\n\n\n\n\n  \n\n\n\n\nWelcome To My Blog\n\n\n\n\n\n\n\nnews\n\n\n\n\n\n\n\n\n\n\n\nSep 21, 2023\n\n\nTristan O’Malley\n\n\n\n\n\n\nNo matching items"
+    "text": "Postcrossing by the Numbers: Discovering the Global Postcard Exchange\n\n\n\n\n\n\n\nanalysis\n\n\n\n\n\n\n\n\n\n\n\nSep 24, 2023\n\n\nAditya Dahiya\n\n\n\n\n\n\n  \n\n\n\n\nWelcome To Facts! Not Opinions! (FaNoOp)\n\n\n\n\n\n\n\nnews\n\n\n\n\n\n\n\n\n\n\n\nSep 24, 2023\n\n\nAditya Dahiya\n\n\n\n\n\n\nNo matching items"
   },
   {
     "objectID": "about.html",
@@ -23,8 +23,15 @@
   {
     "objectID": "posts/welcome/index.html",
     "href": "posts/welcome/index.html",
-    "title": "Welcome To My Blog",
+    "title": "Welcome To Facts! Not Opinions! (FaNoOp)",
     "section": "",
-    "text": "This is the first post in a Quarto blog. Welcome!\n\nSince this post doesn’t specify an explicit image, the first image in the post will be used in the listing page of posts."
+    "text": "Welcome to FaNoOp – where we let Facts Speak Louder Than Opinions!\nGreetings, data enthusiasts, skeptics, and lovers of unadulterated truth! I’m Aditya Dahiya, a bureaucrat with a penchant for Data Visualization, and I’m here to introduce you to a digital realm where facts reign supreme.\nIn a world brimming with information, it’s all too easy to get lost in the noisy cacophony of opinions, biases, and sensationalism. That’s where FaNoOp steps in. Our mission is simple: to extract compelling insights from publicly available data, without any pesky opinions muddying the waters.\nWhy FaNoOp, you ask? Because here, it’s all about “Facts! Not Opinions!” We’re like the no-nonsense bartender who serves you a straight shot of data-driven truth, no chaser.\nHealthcare, an arena where data is both abundant and crucial, is my playground. In my free time, I revel in unraveling the intricacies of healthcare data. And now, I’m sharing my discoveries with you. You see, I’m not just any data aficionado; I’m a bureaucrat with a passion for rational thinking and a keen eye for patterns.\nAt FaNoOp, we’re not about telling you what to think. We’re about empowering you to think critically. We believe that every dataset is a treasure trove of stories waiting to be uncovered, and we’re here to guide you through this data-driven adventure.\nSo, if you’re tired of reading articles that are more opinion than fact, if you crave the thrill of discovering hidden truths in the numbers, and if you’re a rational thinker hungry for unbiased insights – you’ve found your tribe.\nJoin us on this journey as we sift through data, unveil fascinating patterns, and invite you to engage your critical thinking muscles. FaNoOp is your oasis of clarity in the desert of opinions.\nPrepare to be enlightened, entertained, and engaged, because at FaNoOp, facts aren’t just important; they’re everything.\nWelcome aboard, fellow truth-seekers. Let’s embark on this exhilarating quest for facts, one dataset at a time!"
+  },
+  {
+    "objectID": "posts/postcrossing_sep_2023/index.html",
+    "href": "posts/postcrossing_sep_2023/index.html",
+    "title": "Postcrossing by the Numbers: Discovering the Global Postcard Exchange",
+    "section": "",
+    "text": "Hey there, data explorers and globe-trotters of knowledge! Welcome to another exciting expedition into the world of data on FaNoOp. Today, we’re embarking on a journey through the captivating realm of Postcrossing.com – the global hub where postcards find their way to far-flung corners of the Earth.\nEver wondered who’s behind those postcards, where they’re coming from, and what tales they carry? We’re about to dive headfirst into a treasure trove of statistics that will reveal who the Postcrossing community truly is."
   }
 ]
