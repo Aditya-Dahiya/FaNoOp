@@ -13,7 +13,7 @@ execute:
   warning: false
 ---
 
-Hey there, data explorers and globe-trotters of knowledge! Welcome to another exciting expedition into the world of data on FaNoOp. Today, we're embarking on a journey through the captivating realm of [**Postcrossing.com**](https://www.postcrossing.com/) -- the global hub where postcards find their way to far-flung corners of the Earth.
+Hey there, data explorers and globe-trotters of knowledge! Welcome to another exciting expedition into the world of data on *FaNoOp*. Today, we're embarking on a journey through the captivating realm of [**Postcrossing.com**](https://www.postcrossing.com/) -- the global hub where postcards find their way to far-flung corners of the Earth.
 
 Ever wondered who's behind those postcards, where they're coming from, and what tales they carry? We're about to dive headfirst into a treasure trove of statistics that will reveal who the *Postcrossing community* truly is.
 
@@ -25,17 +25,56 @@ library(janitor)
 library(gt)
 library(gtExtras)
 library(ggthemes)
+```
 
-cps = read_csv("countries_postcrossing.csv")
+```{r}
+#| label: read data
+#| output: false
+
+# Data reading in
+cps = read_csv("countries_postcrossing.csv") |>   
+        clean_names() |>
+        mutate(country_name = str_squish(country_name)) |>      
+        mutate(code = if_else(country_name == "Namibia",
+                              "NM",
+                              code)) |>
+        mutate(country_name = if_else(code == "KR", 
+                                      "Korea South", 
+                                      country_name)) |>
+        mutate(country_name = case_when(
+          country_name == "United States of America" ~ "United States",
+          country_name == "Russia" ~ "Russian Federation",
+          country_name == "Egypt" ~ "Egypt, Arab Rep.",
+          country_name == "Virgin Islands" ~ "British Virgin Islands",
+          country_name == "Korea South" ~ "Korea, Rep.",
+          country_name == "Korea" ~ "Korea, Dem. People's Rep.",
+          country_name == "Venezuela" ~ "Venezuela, RB",
+          country_name == "Czech Republic" ~ "Czechia",
+          country_name == "Hong Kong" ~ "Hong Kong SAR, China",
+          country_name == "Kyrgyzstan" ~ "Kyrgyz Republic",
+          country_name == "Macao" ~ "Macao SAR, China",
+          country_name == "Bahamas" ~ "Bahamas, The",
+          country_name == "Yemen" ~ "Yemen, Rep.",
+          country_name == "Türkiye" ~ "Turkiye",
+          country_name == "Iran" ~ "Iran, Islamic Rep.",
+          country_name == "Slovakia" ~ "Slovak Republic",
+          .default = country_name
+        ))
 wb_countries = read_csv("countries_data_from_world_bank.csv", 
     col_types = cols(Value_2022 = col_double()))
 
-ind_names = wb_countries |> 
-  distinct(`Indicator Name`, `Indicator Code`) |>
+# Create a df to read the full names of the indicators
+ind_names_df = wb_countries |> 
+  distinct(`Indicator Name`, `Indicator Code`)
+
+# Vector with full names and clean abbreviations of vectors
+ind_names_vec = ind_names_df |>
   pivot_wider(names_from = `Indicator Code`,
               values_from = `Indicator Name`) |>
-  clean_names()
+  clean_names() |>
+  as_vector()
 
+# Wide format world bank data
 wb_countries = wb_countries |>
   clean_names() |>
   select(-indicator_name, -country_code) |>
@@ -44,5 +83,86 @@ wb_countries = wb_countries |>
               values_from = value_2022) |>
   clean_names()
 
+# Join the data of cps and wb_countries
+df = inner_join(cps, wb_countries, by = join_by("country_name")) |>
+  mutate(
+    prop_members = members/sp_pop_totl,
+    postcard_per_mem = postcards_sent/members,
+    pop_check = pc_pop_estimate/sp_pop_totl
+  ) |>
+  relocate(c(sp_pop_totl,
+             prop_members,
+             postcard_per_mem),
+           .before = sp_pop_grow) |>
+  relocate(pc_pop_estimate, 
+           .before = pop_check) |>
+  select(-code)
+```
 
+```{r}
+#| label: checks_in_the_code_working
+#| eval: false
+#| echo: false
+#| output: false
+
+# Result
+wb_countries
+cps
+dftemp = df$country_name
+
+# Check the left out countries from World Bank
+wb_countries |>
+  filter(!(country_name %in% dftemp)) |>
+  arrange(desc(sp_pop_totl))
+
+#  Check the left out countries from cps
+cps |>
+  filter(!(country_name %in% dftemp)) |>
+  arrange(desc(postcards_sent))
+
+# Check the ratio of population in postcrossing dataset vs. World Bank dataset
+df |>
+  select(country_name, pop_check, sp_pop_totl, pc_pop_estimate) |>
+  filter(pop_check < 0.1 | pop_check > 1.1)
+```
+
+```{r}
+#| label: tbl-analysis-1
+#| tbl-cap-location: top
+#| tbl-cap: "Countries with maximum postcards sent by each member"
+
+df |>
+  filter(members >= 100) |>
+  arrange(desc(postcard_per_mem)) |>
+  slice_head(n = 10) |>
+  select(country_name,
+         members,
+         postcards_sent,
+         sp_pop_totl, 
+         prop_members,
+         postcard_per_mem) |>
+  gt() |>
+  fmt_number(columns = c(sp_pop_totl,
+                         members,
+                         postcards_sent),
+             decimals = 0) |>
+  fmt_percent(columns = prop_members) |>
+  fmt_number(columns = postcard_per_mem,
+             decimals = 1) |>
+  cols_align(align = "center",
+             columns = c(prop_members,
+                         postcard_per_mem)) |>
+  cols_label(
+    sp_pop_totl ~ "total_population",
+    postcard_per_mem ~ "postcards_per_member",
+    prop_members ~ "percentage_poulation_postcrossing"
+  ) |>
+   cols_label_with(
+    fn = ~ janitor::make_clean_names(., case = "title")
+  ) |>
+  gt_theme_538() |>
+  tab_style(
+    style = list(cell_text(weight = "bold")),
+    locations = cells_body(columns = postcard_per_mem)
+  )
 ```
