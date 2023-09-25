@@ -127,14 +127,13 @@ df |>
 ```
 
 ```{r}
-#| label: tbl-analysis-1
+#| label: tbl-max-postcards-per-member
 #| tbl-cap-location: top
 #| tbl-cap: "Countries with maximum postcards sent by each member"
 
 df |>
   filter(members >= 100) |>
   arrange(desc(postcard_per_mem)) |>
-  slice_head(n = 10) |>
   select(country_name,
          members,
          postcards_sent,
@@ -165,4 +164,206 @@ df |>
     style = list(cell_text(weight = "bold")),
     locations = cells_body(columns = postcard_per_mem)
   )
+```
+
+```{r}
+#| label: tbl-max-members-percentage
+#| tbl-cap-location: top
+#| tbl-cap: "Countries with highest postcrossing popularity - most members as percentage of population"
+
+df |>
+  filter(members >= 100) |>
+  arrange(desc(prop_members)) |>
+  slice_head(n = 5) |>
+  select(country_name,
+         members,
+         postcards_sent,
+         sp_pop_totl, 
+         prop_members) |>
+  gt() |>
+  fmt_number(columns = c(sp_pop_totl,
+                         members,
+                         postcards_sent),
+             decimals = 0) |>
+  fmt_percent(columns = prop_members) |>
+  cols_align(align = "center",
+             columns = c(prop_members)) |>
+  cols_label(
+    sp_pop_totl ~ "total_population",
+    prop_members ~ "percentage_poulation_postcrossing"
+  ) |>
+   cols_label_with(
+    fn = ~ janitor::make_clean_names(., case = "title")
+  ) |>
+  gt_theme_538() |>
+  tab_style(
+    style = list(cell_text(weight = "bold")),
+    locations = cells_body(columns = prop_members)
+  )
+```
+
+```{r}
+#| label: max-postcards-sent
+
+df |>
+  select(country_name,
+         postcards_sent) |>
+  arrange(desc(postcards_sent)) |>
+  slice_head(n = 10) |>
+  mutate(col_cn = country_name == "Germany") |>
+  ggplot(aes(y = reorder(country_name, postcards_sent),
+             x = postcards_sent,
+             fill = col_cn)) +
+  geom_bar(stat = "identity") +
+  theme_minimal() +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        legend.position = "none",
+        plot.title.position = "plot") +
+  labs(x = "Number of postcards sent (in millions)",
+       y = NULL,
+       title = "Germany has sent the most postcards",
+       subtitle = "Postcards sent from Germany are more than combined postcards from all countries except the top 15") +
+  scale_x_continuous(labels = scales::label_number_si(),
+                     n.breaks = 6) +
+  scale_fill_brewer(palette = "Set2")
+```
+
+```{r}
+#| label: max-members
+
+
+df |>
+  select(country_name,
+         members) |>
+  arrange(desc(members)) |>
+  slice_head(n = 10) |>
+  mutate(col_cn = country_name == "Germany") |>
+  ggplot(aes(y = reorder(country_name, members),
+             x = members,
+             fill = col_cn)) +
+  geom_bar(stat = "identity") +
+  theme_minimal() +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        legend.position = "none",
+        plot.title.position = "plot") +
+  labs(x = "Postcrossing members (in thousands)",
+       y = NULL,
+       title = "But, Germany doesn't have the most members on postcrossing!",
+       subtitle = "Russia, US and China have members exceeding that of Germany") +
+  scale_x_continuous(labels = scales::label_number_si(),
+                     n.breaks = 6) +
+  scale_fill_brewer(palette = "Set2")
+```
+
+```{r}
+#| label: postcards-per-member
+df |>
+  filter(members >= 100) |>
+  select(country_name,
+         members,
+         postcard_per_mem) |>
+  arrange(desc(members)) |>
+  slice_head(n = 10) |>
+  mutate(postcard_per_mem = round(postcard_per_mem, 0)) |>
+  mutate(col_cn = country_name == "Germany") |>
+  ggplot(aes(y = reorder(country_name, members),
+             x = postcard_per_mem,
+             fill = col_cn,
+             label = postcard_per_mem)) +
+  geom_bar(stat = "identity") +
+  geom_text(hjust = -0.5,
+            size = 3) +
+  theme_minimal() +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        legend.position = "none",
+        plot.title.position = "plot") +
+  labs(x = "Average postcards sent (per member)",
+       y = NULL,
+       title = "However, Germans make up for that by sending more postcards on average!",
+       subtitle = "amongst the top 10 countries, in terms of members.") +
+  scale_x_continuous(labels = scales::label_number_si(),
+                     n.breaks = 6,
+                     limits = c(0, 250)) +
+  scale_fill_brewer(palette = "Set2")
+```
+
+```{r}
+#| label: max-postcards-per-person-all-countries
+
+df |>
+  filter(members >= 100) |>
+  select(country_name,
+         postcard_per_mem) |>
+  arrange(desc(postcard_per_mem)) |>
+  slice_head(n = 10) |>
+  mutate(postcard_per_mem = round(postcard_per_mem, 0)) |>
+  mutate(col_cn = country_name == "Germany") |>
+  ggplot(aes(y = reorder(country_name, postcard_per_mem),
+             x = postcard_per_mem,
+             fill = col_cn,
+             label = postcard_per_mem)) +
+  geom_bar(stat = "identity") +
+  geom_text(hjust = -0.5,
+            size = 3) +
+  theme_minimal() +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        legend.position = "none",
+        plot.title.position = "plot") +
+  labs(x = "Average postcards sent (per member)",
+       y = NULL,
+       title = "But, Luxembourgers and Finns send ever more postcards, on average!",
+       subtitle = "Here's the highest number of average per person postcards") +
+  scale_x_continuous(labels = scales::label_number_si(),
+                     n.breaks = 6) +
+  scale_fill_brewer(palette = "Set2")
+```
+
+```{r}
+#| label: prop-population-as-members
+
+df |>
+  filter(members >= 100) |>
+  select(country_name,
+         prop_members) |>
+  arrange(desc(prop_members)) |>
+  slice_head(n = 12) |>
+  mutate(col_cn = country_name == "Germany") |>
+  ggplot(aes(y = reorder(country_name, prop_members),
+             x = prop_members*100,
+             fill = col_cn)) +
+  geom_bar(stat = "identity") +
+  theme_minimal() +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        legend.position = "none",
+        plot.title.position = "plot") +
+  labs(x = "Percentage of population that uses postcrossing (%)",
+       y = NULL,
+       title = "But, Germany does benefit in total numbers from its relatively large population.",
+       subtitle = "These 11 countries have higher percentage of their population as postcrossing members") +
+  scale_x_continuous(labels = scales::label_number_si(),
+                     n.breaks = 6) +
+  scale_fill_brewer(palette = "Set2")
+```
+
+```{r}
+#| eval: false
+#| output: false
+
+world = map_data("world")
+
+mapdf = left_join(world, df, 
+                  by = join_by("region" == "country_name"))
+names(mapdf)
+ggplot() + 
+  geom_map(data = mapdf,
+           map = mapdf,
+           mapping = aes(x = long,
+                         y = lat,
+                         map_id = region,
+                         fill = prop_members))
 ```
