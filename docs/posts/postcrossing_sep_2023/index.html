@@ -61,6 +61,14 @@ ul.task-list li input[type="checkbox"] {
   }
 }</script>
 
+<script src="../../site_libs/core-js-2.5.3/shim.min.js"></script>
+<script src="../../site_libs/react-17.0.0/react.min.js"></script>
+<script src="../../site_libs/react-17.0.0/react-dom.min.js"></script>
+<script src="../../site_libs/reactwidget-1.0.0/react-tools.js"></script>
+<script src="../../site_libs/htmlwidgets-1.6.2/htmlwidgets.js"></script>
+<link href="../../site_libs/reactable-0.4.4/reactable.css" rel="stylesheet">
+<script src="../../site_libs/reactable-binding-0.4.4/reactable.js"></script>
+
 
 <link rel="stylesheet" href="../../styles.css">
 </head>
@@ -147,28 +155,32 @@ ul.task-list li input[type="checkbox"] {
 
 <p>Hey there, data explorers and globe-trotters of knowledge! Welcome to another exciting expedition into the world of data on <em>FaNoOp</em>. Today, we’re embarking on a journey through the captivating realm of <a href="https://www.postcrossing.com/"><strong>Postcrossing.com</strong></a> – the global hub where postcards find their way to far-flung corners of the Earth.</p>
 <p>Ever wondered who’s behind those postcards, where they’re coming from, and what tales they carry? We’re about to dive headfirst into a treasure trove of statistics that will reveal who the <em>Postcrossing community</em> truly is.</p>
-<div class="cell tbl-cap-location-top">
-<div class="cell-output-display">
-<div id="tbl-max-postcards-per-member" class="anchored">
+<section id="the-complete-data-on-the-postcards-sent-by-postcrossers-across-the-globe" class="level3">
+<h3 class="anchored" data-anchor-id="the-complete-data-on-the-postcards-sent-by-postcrossers-across-the-globe">The complete data on the postcards sent by Postcrossers across the globe:</h3>
+<div id="tbl-max-postcards-per-member" class="cell tbl-cap-location-top tbl-parent quarto-layout-panel anchored" data-tbl-cap="Data on Countries' population, postcards and members">
+<div class="panel-caption table-caption">
+<p><strong>?(caption)</strong></p>
+</div>
+<div class="quarto-layout-row quarto-layout-valign-top">
+<div class="cell-output-display quarto-layout-cell" style="flex-basis: 100.0%;justify-content: center;">
 
-<div id="camukigmzw" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>@import url("https://fonts.googleapis.com/css2?family=Chivo:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
-#camukigmzw table {
-  font-family: Chivo, system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+<div id="mzojqrpyiq" class=".gt_table" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#mzojqrpyiq table {
+  font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#camukigmzw thead, #camukigmzw tbody, #camukigmzw tfoot, #camukigmzw tr, #camukigmzw td, #camukigmzw th {
+#mzojqrpyiq thead, #mzojqrpyiq tbody, #mzojqrpyiq tfoot, #mzojqrpyiq tr, #mzojqrpyiq td, #mzojqrpyiq th {
   border-style: none;
 }
 
-#camukigmzw p {
+#mzojqrpyiq p {
   margin: 0;
   padding: 0;
 }
 
-#camukigmzw .gt_table {
+#mzojqrpyiq .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -176,17 +188,17 @@ ul.task-list li input[type="checkbox"] {
   margin-right: auto;
   color: #333333;
   font-size: 16px;
-  font-weight: 300;
+  font-weight: normal;
   font-style: normal;
   background-color: #FFFFFF;
   width: auto;
-  border-top-style: none;
-  border-top-width: 3px;
+  border-top-style: solid;
+  border-top-width: 2px;
   border-top-color: #A8A8A8;
   border-right-style: none;
   border-right-width: 2px;
   border-right-color: #D3D3D3;
-  border-bottom-style: none;
+  border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #A8A8A8;
   border-left-style: none;
@@ -194,12 +206,12 @@ ul.task-list li input[type="checkbox"] {
   border-left-color: #D3D3D3;
 }
 
-#camukigmzw .gt_caption {
+#mzojqrpyiq .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#camukigmzw .gt_title {
+#mzojqrpyiq .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -211,7 +223,7 @@ ul.task-list li input[type="checkbox"] {
   border-bottom-width: 0;
 }
 
-#camukigmzw .gt_subtitle {
+#mzojqrpyiq .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -223,9 +235,9 @@ ul.task-list li input[type="checkbox"] {
   border-top-width: 0;
 }
 
-#camukigmzw .gt_heading {
+#mzojqrpyiq .gt_heading {
   background-color: #FFFFFF;
-  text-align: left;
+  text-align: center;
   border-bottom-color: #FFFFFF;
   border-left-style: none;
   border-left-width: 1px;
@@ -235,19 +247,19 @@ ul.task-list li input[type="checkbox"] {
   border-right-color: #D3D3D3;
 }
 
-#camukigmzw .gt_bottom_border {
-  border-bottom-style: none;
+#mzojqrpyiq .gt_bottom_border {
+  border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#camukigmzw .gt_col_headings {
-  border-top-style: none;
+#mzojqrpyiq .gt_col_headings {
+  border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
   border-bottom-style: solid;
   border-bottom-width: 2px;
-  border-bottom-color: #000000;
+  border-bottom-color: #D3D3D3;
   border-left-style: none;
   border-left-width: 1px;
   border-left-color: #D3D3D3;
@@ -256,12 +268,12 @@ ul.task-list li input[type="checkbox"] {
   border-right-color: #D3D3D3;
 }
 
-#camukigmzw .gt_col_heading {
+#mzojqrpyiq .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
-  font-size: 80%;
+  font-size: 100%;
   font-weight: normal;
-  text-transform: uppercase;
+  text-transform: inherit;
   border-left-style: none;
   border-left-width: 1px;
   border-left-color: #D3D3D3;
@@ -276,30 +288,30 @@ ul.task-list li input[type="checkbox"] {
   overflow-x: hidden;
 }
 
-#camukigmzw .gt_column_spanner_outer {
+#mzojqrpyiq .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
-  font-size: 80%;
+  font-size: 100%;
   font-weight: normal;
-  text-transform: uppercase;
+  text-transform: inherit;
   padding-top: 0;
   padding-bottom: 0;
   padding-left: 4px;
   padding-right: 4px;
 }
 
-#camukigmzw .gt_column_spanner_outer:first-child {
+#mzojqrpyiq .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#camukigmzw .gt_column_spanner_outer:last-child {
+#mzojqrpyiq .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#camukigmzw .gt_column_spanner {
+#mzojqrpyiq .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
-  border-bottom-color: #000000;
+  border-bottom-color: #D3D3D3;
   vertical-align: bottom;
   padding-top: 5px;
   padding-bottom: 5px;
@@ -308,26 +320,26 @@ ul.task-list li input[type="checkbox"] {
   width: 100%;
 }
 
-#camukigmzw .gt_spanner_row {
+#mzojqrpyiq .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#camukigmzw .gt_group_heading {
+#mzojqrpyiq .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
   padding-right: 5px;
   color: #333333;
   background-color: #FFFFFF;
-  font-size: 80%;
-  font-weight: bolder;
-  text-transform: uppercase;
-  border-top-style: none;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
   border-top-width: 2px;
-  border-top-color: #000000;
+  border-top-color: #D3D3D3;
   border-bottom-style: solid;
-  border-bottom-width: 1px;
-  border-bottom-color: #FFFFFF;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
   border-left-style: none;
   border-left-width: 1px;
   border-left-color: #D3D3D3;
@@ -338,32 +350,32 @@ ul.task-list li input[type="checkbox"] {
   text-align: left;
 }
 
-#camukigmzw .gt_empty_group_heading {
+#mzojqrpyiq .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
-  font-size: 80%;
-  font-weight: bolder;
-  border-top-style: none;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
   border-top-width: 2px;
-  border-top-color: #000000;
+  border-top-color: #D3D3D3;
   border-bottom-style: solid;
-  border-bottom-width: 1px;
-  border-bottom-color: #FFFFFF;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
   vertical-align: middle;
 }
 
-#camukigmzw .gt_from_md > :first-child {
+#mzojqrpyiq .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#camukigmzw .gt_from_md > :last-child {
+#mzojqrpyiq .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#camukigmzw .gt_row {
-  padding-top: 3px;
-  padding-bottom: 3px;
+#mzojqrpyiq .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
   padding-left: 5px;
   padding-right: 5px;
   margin: 10px;
@@ -380,20 +392,20 @@ ul.task-list li input[type="checkbox"] {
   overflow-x: hidden;
 }
 
-#camukigmzw .gt_stub {
+#mzojqrpyiq .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
-  font-size: 80%;
-  font-weight: bolder;
-  text-transform: uppercase;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
   border-right-style: solid;
-  border-right-width: 0px;
-  border-right-color: #FFFFFF;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
   padding-left: 5px;
   padding-right: 5px;
 }
 
-#camukigmzw .gt_stub_row_group {
+#mzojqrpyiq .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -407,15 +419,15 @@ ul.task-list li input[type="checkbox"] {
   vertical-align: top;
 }
 
-#camukigmzw .gt_row_group_first td {
+#mzojqrpyiq .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#camukigmzw .gt_row_group_first th {
+#mzojqrpyiq .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#camukigmzw .gt_summary_row {
+#mzojqrpyiq .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -425,16 +437,16 @@ ul.task-list li input[type="checkbox"] {
   padding-right: 5px;
 }
 
-#camukigmzw .gt_first_summary_row {
+#mzojqrpyiq .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#camukigmzw .gt_first_summary_row.thick {
+#mzojqrpyiq .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#camukigmzw .gt_last_summary_row {
+#mzojqrpyiq .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -444,7 +456,7 @@ ul.task-list li input[type="checkbox"] {
   border-bottom-color: #D3D3D3;
 }
 
-#camukigmzw .gt_grand_summary_row {
+#mzojqrpyiq .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -454,7 +466,7 @@ ul.task-list li input[type="checkbox"] {
   padding-right: 5px;
 }
 
-#camukigmzw .gt_first_grand_summary_row {
+#mzojqrpyiq .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -464,7 +476,7 @@ ul.task-list li input[type="checkbox"] {
   border-top-color: #D3D3D3;
 }
 
-#camukigmzw .gt_last_grand_summary_row_top {
+#mzojqrpyiq .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -474,11 +486,11 @@ ul.task-list li input[type="checkbox"] {
   border-bottom-color: #D3D3D3;
 }
 
-#camukigmzw .gt_striped {
+#mzojqrpyiq .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#camukigmzw .gt_table_body {
+#mzojqrpyiq .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -487,7 +499,7 @@ ul.task-list li input[type="checkbox"] {
   border-bottom-color: #D3D3D3;
 }
 
-#camukigmzw .gt_footnotes {
+#mzojqrpyiq .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -501,7 +513,7 @@ ul.task-list li input[type="checkbox"] {
   border-right-color: #D3D3D3;
 }
 
-#camukigmzw .gt_footnote {
+#mzojqrpyiq .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -510,7 +522,7 @@ ul.task-list li input[type="checkbox"] {
   padding-right: 5px;
 }
 
-#camukigmzw .gt_sourcenotes {
+#mzojqrpyiq .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -524,155 +536,86 @@ ul.task-list li input[type="checkbox"] {
   border-right-color: #D3D3D3;
 }
 
-#camukigmzw .gt_sourcenote {
-  font-size: 12px;
+#mzojqrpyiq .gt_sourcenote {
+  font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
   padding-left: 5px;
   padding-right: 5px;
 }
 
-#camukigmzw .gt_left {
+#mzojqrpyiq .gt_left {
   text-align: left;
 }
 
-#camukigmzw .gt_center {
+#mzojqrpyiq .gt_center {
   text-align: center;
 }
 
-#camukigmzw .gt_right {
+#mzojqrpyiq .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#camukigmzw .gt_font_normal {
+#mzojqrpyiq .gt_font_normal {
   font-weight: normal;
 }
 
-#camukigmzw .gt_font_bold {
+#mzojqrpyiq .gt_font_bold {
   font-weight: bold;
 }
 
-#camukigmzw .gt_font_italic {
+#mzojqrpyiq .gt_font_italic {
   font-style: italic;
 }
 
-#camukigmzw .gt_super {
+#mzojqrpyiq .gt_super {
   font-size: 65%;
 }
 
-#camukigmzw .gt_footnote_marks {
+#mzojqrpyiq .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#camukigmzw .gt_asterisk {
+#mzojqrpyiq .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#camukigmzw .gt_indent_1 {
+#mzojqrpyiq .gt_indent_1 {
   text-indent: 5px;
 }
 
-#camukigmzw .gt_indent_2 {
+#mzojqrpyiq .gt_indent_2 {
   text-indent: 10px;
 }
 
-#camukigmzw .gt_indent_3 {
+#mzojqrpyiq .gt_indent_3 {
   text-indent: 15px;
 }
 
-#camukigmzw .gt_indent_4 {
+#mzojqrpyiq .gt_indent_4 {
   text-indent: 20px;
 }
 
-#camukigmzw .gt_indent_5 {
+#mzojqrpyiq .gt_indent_5 {
   text-indent: 25px;
 }
-
-tbody tr:last-child {
-  border-bottom: 2px solid #ffffff00;
-}
 </style>
-<table class="gt_table" data-quarto-disable-processing="false" data-quarto-bootstrap="false"><caption>Table&nbsp;1:  <p>Countries with maximum postcards sent by each member</p> </caption>
-  <thead>
-    
-    <tr class="gt_col_headings">
-      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="border-top-width: 0px; border-top-style: solid; border-top-color: black;" scope="col" id="Country Name">Country Name</th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="border-top-width: 0px; border-top-style: solid; border-top-color: black;" scope="col" id="Members">Members</th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="border-top-width: 0px; border-top-style: solid; border-top-color: black;" scope="col" id="Postcards Sent">Postcards Sent</th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="border-top-width: 0px; border-top-style: solid; border-top-color: black;" scope="col" id="Total Population">Total Population</th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="border-top-width: 0px; border-top-style: solid; border-top-color: black;" scope="col" id="Percentage Poulation Postcrossing">Percentage Poulation Postcrossing</th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="border-top-width: 0px; border-top-style: solid; border-top-color: black;" scope="col" id="Postcards per Member">Postcards per Member</th>
-    </tr>
-  </thead>
-  <tbody class="gt_table_body">
-    <tr><td headers="country_name" class="gt_row gt_left">Luxembourg</td>
-<td headers="members" class="gt_row gt_right">317</td>
-<td headers="postcards_sent" class="gt_row gt_right">97,473</td>
-<td headers="sp_pop_totl" class="gt_row gt_right">650,774</td>
-<td headers="prop_members" class="gt_row gt_center">0.05%</td>
-<td headers="postcard_per_mem" class="gt_row gt_center" style="font-weight: bold;">307.5</td></tr>
-    <tr><td headers="country_name" class="gt_row gt_left">Finland</td>
-<td headers="members" class="gt_row gt_right">16,639</td>
-<td headers="postcards_sent" class="gt_row gt_right">4,242,933</td>
-<td headers="sp_pop_totl" class="gt_row gt_right">5,556,880</td>
-<td headers="prop_members" class="gt_row gt_center">0.30%</td>
-<td headers="postcard_per_mem" class="gt_row gt_center" style="font-weight: bold;">255.0</td></tr>
-    <tr><td headers="country_name" class="gt_row gt_left">Germany</td>
-<td headers="members" class="gt_row gt_right">59,441</td>
-<td headers="postcards_sent" class="gt_row gt_right">12,637,125</td>
-<td headers="sp_pop_totl" class="gt_row gt_right">84,079,811</td>
-<td headers="prop_members" class="gt_row gt_center">0.07%</td>
-<td headers="postcard_per_mem" class="gt_row gt_center" style="font-weight: bold;">212.6</td></tr>
-    <tr><td headers="country_name" class="gt_row gt_left">Slovenia</td>
-<td headers="members" class="gt_row gt_right">1,155</td>
-<td headers="postcards_sent" class="gt_row gt_right">226,749</td>
-<td headers="sp_pop_totl" class="gt_row gt_right">2,108,732</td>
-<td headers="prop_members" class="gt_row gt_center">0.05%</td>
-<td headers="postcard_per_mem" class="gt_row gt_center" style="font-weight: bold;">196.3</td></tr>
-    <tr><td headers="country_name" class="gt_row gt_left">Austria</td>
-<td headers="members" class="gt_row gt_right">3,348</td>
-<td headers="postcards_sent" class="gt_row gt_right">652,090</td>
-<td headers="sp_pop_totl" class="gt_row gt_right">9,042,528</td>
-<td headers="prop_members" class="gt_row gt_center">0.04%</td>
-<td headers="postcard_per_mem" class="gt_row gt_center" style="font-weight: bold;">194.8</td></tr>
-    <tr><td headers="country_name" class="gt_row gt_left">Norway</td>
-<td headers="members" class="gt_row gt_right">1,248</td>
-<td headers="postcards_sent" class="gt_row gt_right">237,834</td>
-<td headers="sp_pop_totl" class="gt_row gt_right">5,457,127</td>
-<td headers="prop_members" class="gt_row gt_center">0.02%</td>
-<td headers="postcard_per_mem" class="gt_row gt_center" style="font-weight: bold;">190.6</td></tr>
-    <tr><td headers="country_name" class="gt_row gt_left">Malta</td>
-<td headers="members" class="gt_row gt_right">124</td>
-<td headers="postcards_sent" class="gt_row gt_right">22,682</td>
-<td headers="sp_pop_totl" class="gt_row gt_right">523,417</td>
-<td headers="prop_members" class="gt_row gt_center">0.02%</td>
-<td headers="postcard_per_mem" class="gt_row gt_center" style="font-weight: bold;">182.9</td></tr>
-    <tr><td headers="country_name" class="gt_row gt_left">Switzerland</td>
-<td headers="members" class="gt_row gt_right">3,575</td>
-<td headers="postcards_sent" class="gt_row gt_right">648,641</td>
-<td headers="sp_pop_totl" class="gt_row gt_right">8,769,741</td>
-<td headers="prop_members" class="gt_row gt_center">0.04%</td>
-<td headers="postcard_per_mem" class="gt_row gt_center" style="font-weight: bold;">181.4</td></tr>
-    <tr><td headers="country_name" class="gt_row gt_left">Ireland</td>
-<td headers="members" class="gt_row gt_right">1,349</td>
-<td headers="postcards_sent" class="gt_row gt_right">233,165</td>
-<td headers="sp_pop_totl" class="gt_row gt_right">5,086,988</td>
-<td headers="prop_members" class="gt_row gt_center">0.03%</td>
-<td headers="postcard_per_mem" class="gt_row gt_center" style="font-weight: bold;">172.8</td></tr>
-    <tr><td headers="country_name" class="gt_row gt_left">Iceland</td>
-<td headers="members" class="gt_row gt_right">203</td>
-<td headers="postcards_sent" class="gt_row gt_right">33,758</td>
-<td headers="sp_pop_totl" class="gt_row gt_right">381,900</td>
-<td headers="prop_members" class="gt_row gt_center">0.05%</td>
-<td headers="postcard_per_mem" class="gt_row gt_center" style="font-weight: bold;">166.3</td></tr>
-  </tbody>
-  
-  
-</table>
+<div id="mzojqrpyiq" class="reactable html-widget " style="width:auto;height:auto;"></div>
+<div style="font-family:system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;border-top-style:solid;border-top-width:2px;border-top-color:#D3D3D3;border-bottom-style:solid;border-bottom-width:2px;border-bottom-color:#D3D3D3;padding-top:6px;padding-bottom:6px;padding-left:10px;padding-right:10px;">
+<div>
+
+
+Data from the <em>Postcrossing.com</em> and the World Bank <strong>DataBank</strong>.
+
+
+</div>
+<div></div>
+</div>
+<script type="application/json" data-for="mzojqrpyiq">{"x":{"tag":{"name":"Reactable","attribs":{"data":{"country_name":["Luxembourg","Finland","Germany","Slovenia","Austria","Norway","Malta","Switzerland","Ireland","Iceland","Estonia","Belgium","Japan","Cyprus","Netherlands","Romania","Croatia","Australia","New Zealand","Denmark","Israel","Italy","Greece","Sweden","Singapore","Latvia","United States","Portugal","Canada","Lithuania","Slovak Republic","Armenia","United Arab Emirates","Moldova","Malaysia","Hungary","Spain","Uzbekistan","Bulgaria","Puerto Rico","United Kingdom","Czechia","Belarus","France","South Africa","Serbia","Algeria","Philippines","Hong Kong SAR, China","Russian Federation","Bosnia and Herzegovina","Brazil","Azerbaijan","Costa Rica","Macao SAR, China","Ukraine","Kazakhstan","Thailand","Poland","Chile","Korea, Rep.","Mexico","Sri Lanka","Vietnam","Morocco","China","India","Argentina","Indonesia","Turkiye"],"members":[317,16639,59441,1155,3348,1248,124,3575,1349,203,1795,5355,12170,161,37740,1402,724,6289,1784,527,581,5018,712,1673,3013,3040,74373,6064,11010,7451,2736,101,320,681,5889,2155,7573,162,1722,159,17804,21956,31772,17752,1770,818,171,2102,10071,114543,156,7523,115,143,769,25884,878,5122,31554,536,5305,1262,397,192,143,72129,11641,525,8622,10411],"postcards_sent":[97473,4242933,12637125,226749,652090,237834,22682,648641,233165,33758,285855,822216,1830535,23132,5228890,191081,96386,830657,234334,69205,75919,649099,91232,213100,378121,379663,8996969,713276,1280048,816816,287152,10560,33195,63853,546420,196554,690257,14577,153143,13965,1549735,1884859,2717290,1496281,144151,62330,12996,158698,752352,8552993,11293,519605,7873,9699,50794,1623880,55067,292408,1665487,25980,254605,55503,17320,8138,5928,2982052,465613,19798,316340,370463],"sp_pop_totl":[650774,5556880,84079811,2108732,9042528,5457127,523417,8769741,5086988,381900,1344768,11669446,125124989,1251488,17703090,18956666,3854000,25978935,5124100,5903037,9550600,58856847,10566531,10486941,5637022,1883379,333287557,10379007,38929902,2833000,5431752,2780469,9441129,2592477,33938221,9683505,47615034,35648100,6465097,3221789,66971411,10526073,9208701,67935660,59893885,6760087,44903225,115559009,7346100,143555736,3233526,215313498,10175016,5180829,695168,38000000,19621972,71697030,37561599,19603733,51628117,127504125,22181000,98186856,37457971,1412175000,1417173173,46234830,275501339,85341241],"prop_members":[0.000487112269389988,0.00299430615741207,0.000706959248516864,0.000547722517607738,0.000370250443238882,0.000228691763999628,0.0002369048005701,0.000407651719703011,0.000265186393205567,0.000531552762503273,0.00133480273177232,0.000458890679129069,9.72627458133083e-05,0.000128646858779309,0.00213183122268485,7.39581527680026e-05,0.000187856772184743,0.000242080747343954,0.000348158701040183,8.92760794147148e-05,6.08338743115616e-05,8.52577101182467e-05,6.73825686026947e-05,0.000159531745243918,0.000534502082837356,0.00161412015319275,0.000223149644917587,0.000584256278081323,0.000282816021473673,0.00263007412636781,0.000503704881960738,3.63248070739145e-05,3.38942514184479e-05,0.000262683140486878,0.000173521175432266,0.000222543386924466,0.000159046405385324,4.54442172233583e-06,0.000266353312255021,4.93514628052923e-05,0.000265844779647841,0.00208586811054797,0.00345021518235851,0.000261306065179907,2.95522656444811e-05,0.000121004359855132,3.80818972356663e-06,1.81898410014921e-05,0.00137093151468126,0.000797899151866701,4.82445479021972e-05,3.49397509672153e-05,1.13021935297202e-05,2.76017602588312e-05,0.00110620742036457,0.000681157894736842,4.47457574600555e-05,7.1439500353083e-05,0.000840060083704104,2.73417312916882e-05,0.000102754086499029,9.89771899536584e-06,1.78982011631577e-05,1.95545521897554e-06,3.81761201107236e-06,5.10765308832121e-05,8.21423960161289e-06,1.13550758162191e-05,3.12956736663991e-05,0.000121992601443422],"postcard_per_mem":[307.485804416404,254.999278802813,212.599468380411,196.319480519481,194.770011947431,190.572115384615,182.91935483871,181.438041958042,172.842846553002,166.295566502463,159.25069637883,153.541736694678,150.413722267872,143.67701863354,138.550344462109,136.291726105563,133.129834254144,132.080934965813,131.353139013453,131.318785578748,130.669535283993,129.354125149462,128.134831460674,127.375971309026,125.496515101228,124.889144736842,120.970903419252,117.624670184697,116.262306993642,109.625016776272,104.953216374269,104.554455445545,103.734375,93.7635829662261,92.7865511971472,91.2083526682135,91.1471015449624,89.9814814814815,88.9332171893147,87.8301886792453,87.0442035497641,85.8471032975041,85.5246758151832,84.2880238846327,81.4412429378531,76.1980440097799,76,75.4985727878211,74.7047959487638,74.6705865919349,72.3910256410256,69.06885550977,68.4608695652174,67.8251748251748,66.0520156046814,62.7368258383557,62.7186788154898,57.0886372510738,52.7821195411041,48.4701492537313,47.9934024505184,43.9801901743265,43.6272040302267,42.3854166666667,41.4545454545455,41.34331544871,39.9976806116313,37.7104761904762,36.6898631408026,35.5838055902411]},"columns":[{"id":"country_name","name":"Country Name","type":"character","style":"function(rowInfo, colInfo) {\nconst rowIndex = rowInfo.index + 1\n}","cell":["Luxembourg","Finland","Germany","Slovenia","Austria","Norway","Malta","Switzerland","Ireland","Iceland","Estonia","Belgium","Japan","Cyprus","Netherlands","Romania","Croatia","Australia","New Zealand","Denmark","Israel","Italy","Greece","Sweden","Singapore","Latvia","United States","Portugal","Canada","Lithuania","Slovak Republic","Armenia","United Arab Emirates","Moldova","Malaysia","Hungary","Spain","Uzbekistan","Bulgaria","Puerto Rico","United Kingdom","Czechia","Belarus","France","South Africa","Serbia","Algeria","Philippines","Hong Kong SAR, China","Russian Federation","Bosnia and Herzegovina","Brazil","Azerbaijan","Costa Rica","Macao SAR, China","Ukraine","Kazakhstan","Thailand","Poland","Chile","Korea, Rep.","Mexico","Sri Lanka","Vietnam","Morocco","China","India","Argentina","Indonesia","Turkiye"],"html":true,"align":"left","headerStyle":{"font-weight":"normal"}},{"id":"members","name":"Members","type":"numeric","style":"function(rowInfo, colInfo) {\nconst rowIndex = rowInfo.index + 1\n}","cell":["317","16,639","59,441","1,155","3,348","1,248","124","3,575","1,349","203","1,795","5,355","12,170","161","37,740","1,402","724","6,289","1,784","527","581","5,018","712","1,673","3,013","3,040","74,373","6,064","11,010","7,451","2,736","101","320","681","5,889","2,155","7,573","162","1,722","159","17,804","21,956","31,772","17,752","1,770","818","171","2,102","10,071","114,543","156","7,523","115","143","769","25,884","878","5,122","31,554","536","5,305","1,262","397","192","143","72,129","11,641","525","8,622","10,411"],"html":true,"align":"right","headerStyle":{"font-weight":"normal"}},{"id":"postcards_sent","name":"Postcards Sent","type":"numeric","style":"function(rowInfo, colInfo) {\nconst rowIndex = rowInfo.index + 1\n}","cell":["97,473","4,242,933","12,637,125","226,749","652,090","237,834","22,682","648,641","233,165","33,758","285,855","822,216","1,830,535","23,132","5,228,890","191,081","96,386","830,657","234,334","69,205","75,919","649,099","91,232","213,100","378,121","379,663","8,996,969","713,276","1,280,048","816,816","287,152","10,560","33,195","63,853","546,420","196,554","690,257","14,577","153,143","13,965","1,549,735","1,884,859","2,717,290","1,496,281","144,151","62,330","12,996","158,698","752,352","8,552,993","11,293","519,605","7,873","9,699","50,794","1,623,880","55,067","292,408","1,665,487","25,980","254,605","55,503","17,320","8,138","5,928","2,982,052","465,613","19,798","316,340","370,463"],"html":true,"align":"right","headerStyle":{"font-weight":"normal"}},{"id":"sp_pop_totl","name":"Total Population","type":"numeric","style":"function(rowInfo, colInfo) {\nconst rowIndex = rowInfo.index + 1\n}","cell":["650,774","5,556,880","84,079,811","2,108,732","9,042,528","5,457,127","523,417","8,769,741","5,086,988","381,900","1,344,768","11,669,446","125,124,989","1,251,488","17,703,090","18,956,666","3,854,000","25,978,935","5,124,100","5,903,037","9,550,600","58,856,847","10,566,531","10,486,941","5,637,022","1,883,379","333,287,557","10,379,007","38,929,902","2,833,000","5,431,752","2,780,469","9,441,129","2,592,477","33,938,221","9,683,505","47,615,034","35,648,100","6,465,097","3,221,789","66,971,411","10,526,073","9,208,701","67,935,660","59,893,885","6,760,087","44,903,225","115,559,009","7,346,100","143,555,736","3,233,526","215,313,498","10,175,016","5,180,829","695,168","38,000,000","19,621,972","71,697,030","37,561,599","19,603,733","51,628,117","127,504,125","22,181,000","98,186,856","37,457,971","1,412,175,000","1,417,173,173","46,234,830","275,501,339","85,341,241"],"html":true,"align":"right","headerStyle":{"font-weight":"normal"}},{"id":"prop_members","name":"Percentage Poulation Postcrossing","type":"numeric","style":"function(rowInfo, colInfo) {\nconst rowIndex = rowInfo.index + 1\n}","cell":["0.05%","0.30%","0.07%","0.05%","0.04%","0.02%","0.02%","0.04%","0.03%","0.05%","0.13%","0.05%","0.01%","0.01%","0.21%","0.01%","0.02%","0.02%","0.03%","0.01%","0.01%","0.01%","0.01%","0.02%","0.05%","0.16%","0.02%","0.06%","0.03%","0.26%","0.05%","0.00%","0.00%","0.03%","0.02%","0.02%","0.02%","0.00%","0.03%","0.00%","0.03%","0.21%","0.35%","0.03%","0.00%","0.01%","0.00%","0.00%","0.14%","0.08%","0.00%","0.00%","0.00%","0.00%","0.11%","0.07%","0.00%","0.01%","0.08%","0.00%","0.01%","0.00%","0.00%","0.00%","0.00%","0.01%","0.00%","0.00%","0.00%","0.01%"],"html":true,"align":"center","headerStyle":{"font-weight":"normal"}},{"id":"postcard_per_mem","name":"Postcards per Member","type":"numeric","style":"function(rowInfo, colInfo) {\nconst rowIndex = rowInfo.index + 1\n}","cell":["307.5","255.0","212.6","196.3","194.8","190.6","182.9","181.4","172.8","166.3","159.3","153.5","150.4","143.7","138.6","136.3","133.1","132.1","131.4","131.3","130.7","129.4","128.1","127.4","125.5","124.9","121.0","117.6","116.3","109.6","105.0","104.6","103.7","93.8","92.8","91.2","91.1","90.0","88.9","87.8","87.0","85.8","85.5","84.3","81.4","76.2","76.0","75.5","74.7","74.7","72.4","69.1","68.5","67.8","66.1","62.7","62.7","57.1","52.8","48.5","48.0","44.0","43.6","42.4","41.5","41.3","40.0","37.7","36.7","35.6"],"html":true,"align":"center","headerStyle":{"font-weight":"normal"}}],"searchable":true,"defaultPageSize":5,"showPageSizeOptions":true,"pageSizeOptions":[10,25,50,100],"paginationType":"numbers","showPagination":true,"showPageInfo":true,"minRows":1,"highlight":true,"compact":true,"showSortable":true,"height":"auto","theme":{"color":"#333333","backgroundColor":"#FFFFFF","stripedColor":"rgba(128,128,128,0.05)","style":{"fontFamily":"system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif"},"headerStyle":{"borderTopStyle":"solid","borderTopWidth":"2px","borderTopColor":"#D3D3D3","borderBottomStyle":"solid","borderBottomWidth":"2px","borderBottomColor":"#D3D3D3"}},"elementId":"mzojqrpyiq","dataKey":"da2aa7d99258f0829d55b0370186c108"},"children":[]},"class":"reactR_markup"},"evals":["tag.attribs.columns.0.style","tag.attribs.columns.1.style","tag.attribs.columns.2.style","tag.attribs.columns.3.style","tag.attribs.columns.4.style","tag.attribs.columns.5.style"],"jsHooks":[]}</script>
 </div>
 </div>
 </div>
@@ -681,24 +624,24 @@ tbody tr:last-child {
 <div class="cell-output-display">
 <div id="tbl-max-members-percentage" class="anchored">
 
-<div id="ggblqnedrq" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="hxqqvpcxum" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>@import url("https://fonts.googleapis.com/css2?family=Chivo:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
-#ggblqnedrq table {
+#hxqqvpcxum table {
   font-family: Chivo, system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#ggblqnedrq thead, #ggblqnedrq tbody, #ggblqnedrq tfoot, #ggblqnedrq tr, #ggblqnedrq td, #ggblqnedrq th {
+#hxqqvpcxum thead, #hxqqvpcxum tbody, #hxqqvpcxum tfoot, #hxqqvpcxum tr, #hxqqvpcxum td, #hxqqvpcxum th {
   border-style: none;
 }
 
-#ggblqnedrq p {
+#hxqqvpcxum p {
   margin: 0;
   padding: 0;
 }
 
-#ggblqnedrq .gt_table {
+#hxqqvpcxum .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -724,12 +667,12 @@ tbody tr:last-child {
   border-left-color: #D3D3D3;
 }
 
-#ggblqnedrq .gt_caption {
+#hxqqvpcxum .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#ggblqnedrq .gt_title {
+#hxqqvpcxum .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -741,7 +684,7 @@ tbody tr:last-child {
   border-bottom-width: 0;
 }
 
-#ggblqnedrq .gt_subtitle {
+#hxqqvpcxum .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -753,7 +696,7 @@ tbody tr:last-child {
   border-top-width: 0;
 }
 
-#ggblqnedrq .gt_heading {
+#hxqqvpcxum .gt_heading {
   background-color: #FFFFFF;
   text-align: left;
   border-bottom-color: #FFFFFF;
@@ -765,13 +708,13 @@ tbody tr:last-child {
   border-right-color: #D3D3D3;
 }
 
-#ggblqnedrq .gt_bottom_border {
+#hxqqvpcxum .gt_bottom_border {
   border-bottom-style: none;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#ggblqnedrq .gt_col_headings {
+#hxqqvpcxum .gt_col_headings {
   border-top-style: none;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -786,7 +729,7 @@ tbody tr:last-child {
   border-right-color: #D3D3D3;
 }
 
-#ggblqnedrq .gt_col_heading {
+#hxqqvpcxum .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 80%;
@@ -806,7 +749,7 @@ tbody tr:last-child {
   overflow-x: hidden;
 }
 
-#ggblqnedrq .gt_column_spanner_outer {
+#hxqqvpcxum .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 80%;
@@ -818,15 +761,15 @@ tbody tr:last-child {
   padding-right: 4px;
 }
 
-#ggblqnedrq .gt_column_spanner_outer:first-child {
+#hxqqvpcxum .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#ggblqnedrq .gt_column_spanner_outer:last-child {
+#hxqqvpcxum .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#ggblqnedrq .gt_column_spanner {
+#hxqqvpcxum .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #000000;
@@ -838,11 +781,11 @@ tbody tr:last-child {
   width: 100%;
 }
 
-#ggblqnedrq .gt_spanner_row {
+#hxqqvpcxum .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#ggblqnedrq .gt_group_heading {
+#hxqqvpcxum .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -868,7 +811,7 @@ tbody tr:last-child {
   text-align: left;
 }
 
-#ggblqnedrq .gt_empty_group_heading {
+#hxqqvpcxum .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -883,15 +826,15 @@ tbody tr:last-child {
   vertical-align: middle;
 }
 
-#ggblqnedrq .gt_from_md > :first-child {
+#hxqqvpcxum .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#ggblqnedrq .gt_from_md > :last-child {
+#hxqqvpcxum .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#ggblqnedrq .gt_row {
+#hxqqvpcxum .gt_row {
   padding-top: 3px;
   padding-bottom: 3px;
   padding-left: 5px;
@@ -910,7 +853,7 @@ tbody tr:last-child {
   overflow-x: hidden;
 }
 
-#ggblqnedrq .gt_stub {
+#hxqqvpcxum .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 80%;
@@ -923,7 +866,7 @@ tbody tr:last-child {
   padding-right: 5px;
 }
 
-#ggblqnedrq .gt_stub_row_group {
+#hxqqvpcxum .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -937,15 +880,15 @@ tbody tr:last-child {
   vertical-align: top;
 }
 
-#ggblqnedrq .gt_row_group_first td {
+#hxqqvpcxum .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#ggblqnedrq .gt_row_group_first th {
+#hxqqvpcxum .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#ggblqnedrq .gt_summary_row {
+#hxqqvpcxum .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -955,16 +898,16 @@ tbody tr:last-child {
   padding-right: 5px;
 }
 
-#ggblqnedrq .gt_first_summary_row {
+#hxqqvpcxum .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#ggblqnedrq .gt_first_summary_row.thick {
+#hxqqvpcxum .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#ggblqnedrq .gt_last_summary_row {
+#hxqqvpcxum .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -974,7 +917,7 @@ tbody tr:last-child {
   border-bottom-color: #D3D3D3;
 }
 
-#ggblqnedrq .gt_grand_summary_row {
+#hxqqvpcxum .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -984,7 +927,7 @@ tbody tr:last-child {
   padding-right: 5px;
 }
 
-#ggblqnedrq .gt_first_grand_summary_row {
+#hxqqvpcxum .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -994,7 +937,7 @@ tbody tr:last-child {
   border-top-color: #D3D3D3;
 }
 
-#ggblqnedrq .gt_last_grand_summary_row_top {
+#hxqqvpcxum .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1004,11 +947,11 @@ tbody tr:last-child {
   border-bottom-color: #D3D3D3;
 }
 
-#ggblqnedrq .gt_striped {
+#hxqqvpcxum .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#ggblqnedrq .gt_table_body {
+#hxqqvpcxum .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1017,7 +960,7 @@ tbody tr:last-child {
   border-bottom-color: #D3D3D3;
 }
 
-#ggblqnedrq .gt_footnotes {
+#hxqqvpcxum .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1031,7 +974,7 @@ tbody tr:last-child {
   border-right-color: #D3D3D3;
 }
 
-#ggblqnedrq .gt_footnote {
+#hxqqvpcxum .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -1040,7 +983,7 @@ tbody tr:last-child {
   padding-right: 5px;
 }
 
-#ggblqnedrq .gt_sourcenotes {
+#hxqqvpcxum .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1054,7 +997,7 @@ tbody tr:last-child {
   border-right-color: #D3D3D3;
 }
 
-#ggblqnedrq .gt_sourcenote {
+#hxqqvpcxum .gt_sourcenote {
   font-size: 12px;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -1062,63 +1005,63 @@ tbody tr:last-child {
   padding-right: 5px;
 }
 
-#ggblqnedrq .gt_left {
+#hxqqvpcxum .gt_left {
   text-align: left;
 }
 
-#ggblqnedrq .gt_center {
+#hxqqvpcxum .gt_center {
   text-align: center;
 }
 
-#ggblqnedrq .gt_right {
+#hxqqvpcxum .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#ggblqnedrq .gt_font_normal {
+#hxqqvpcxum .gt_font_normal {
   font-weight: normal;
 }
 
-#ggblqnedrq .gt_font_bold {
+#hxqqvpcxum .gt_font_bold {
   font-weight: bold;
 }
 
-#ggblqnedrq .gt_font_italic {
+#hxqqvpcxum .gt_font_italic {
   font-style: italic;
 }
 
-#ggblqnedrq .gt_super {
+#hxqqvpcxum .gt_super {
   font-size: 65%;
 }
 
-#ggblqnedrq .gt_footnote_marks {
+#hxqqvpcxum .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#ggblqnedrq .gt_asterisk {
+#hxqqvpcxum .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#ggblqnedrq .gt_indent_1 {
+#hxqqvpcxum .gt_indent_1 {
   text-indent: 5px;
 }
 
-#ggblqnedrq .gt_indent_2 {
+#hxqqvpcxum .gt_indent_2 {
   text-indent: 10px;
 }
 
-#ggblqnedrq .gt_indent_3 {
+#hxqqvpcxum .gt_indent_3 {
   text-indent: 15px;
 }
 
-#ggblqnedrq .gt_indent_4 {
+#hxqqvpcxum .gt_indent_4 {
   text-indent: 20px;
 }
 
-#ggblqnedrq .gt_indent_5 {
+#hxqqvpcxum .gt_indent_5 {
   text-indent: 25px;
 }
 
@@ -1126,7 +1069,7 @@ tbody tr:last-child {
   border-bottom: 2px solid #ffffff00;
 }
 </style>
-<table class="gt_table" data-quarto-disable-processing="false" data-quarto-bootstrap="false"><caption>Table&nbsp;2:  <p>Countries with highest postcrossing popularity - most members as
+<table class="gt_table" data-quarto-disable-processing="false" data-quarto-bootstrap="false"><caption>Table&nbsp;1:  <p>Countries with highest postcrossing popularity - most members as
 percentage of population</p> </caption>
   <thead>
     
@@ -1197,8 +1140,33 @@ percentage of population</p> </caption>
 <p><img src="index_files/figure-html/prop-population-as-members-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
+</section>
+<section id="relation-of-postcards-sent-per-member-to-the-ageing-of-population-in-countries" class="level3">
+<h3 class="anchored" data-anchor-id="relation-of-postcards-sent-per-member-to-the-ageing-of-population-in-countries">Relation of postcards sent per member to the ageing of population in countries:</h3>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="index_files/figure-html/relation-of-age-distribution-with-postcards-sent-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="index_files/figure-html/postcrossers-top-100-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="index_files/figure-html/postcrossers-top-100-last-60-days-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>Looking closely at the <em>postcrossers</em> who figure both in the <strong>Top 100 of all time</strong> and <strong>Top 100 of last 60 days</strong></p>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="index_files/figure-html/change-of-ranks-in-top-100-alltime-60days-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
 
 
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">

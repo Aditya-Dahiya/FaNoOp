@@ -25,6 +25,7 @@ library(janitor)
 library(gt)
 library(gtExtras)
 library(ggthemes)
+library(scales)
 ```
 
 ```{r}
@@ -126,10 +127,12 @@ df |>
   filter(pop_check < 0.1 | pop_check > 1.1)
 ```
 
+### The complete data on the postcards sent by Postcrossers across the globe:
+
 ```{r}
 #| label: tbl-max-postcards-per-member
 #| tbl-cap-location: top
-#| tbl-cap: "Countries with maximum postcards sent by each member"
+#| tbl-cap: "Data on Countries' population, postcards and members"
 
 df |>
   filter(members >= 100) |>
@@ -159,11 +162,14 @@ df |>
    cols_label_with(
     fn = ~ janitor::make_clean_names(., case = "title")
   ) |>
-  gt_theme_538() |>
-  tab_style(
-    style = list(cell_text(weight = "bold")),
-    locations = cells_body(columns = postcard_per_mem)
-  )
+  opt_interactive(use_search = TRUE,
+                  use_highlight = TRUE,
+                  use_compact_mode = TRUE,
+                  use_page_size_select = TRUE,
+                  page_size_default = 5) |>
+  tab_source_note(source_note = md(
+    "Data from the _Postcrossing.com_ and the World Bank **DataBank**."
+  ))
 ```
 
 ```{r}
@@ -351,6 +357,7 @@ df |>
 ```
 
 ```{r}
+#| label: Attempt at the World Map Chloropleth
 #| eval: false
 #| output: false
 
@@ -366,4 +373,201 @@ ggplot() +
                          y = lat,
                          map_id = region,
                          fill = prop_members))
+```
+
+### Relation of postcards sent per member to the ageing of population in countries:
+
+```{r}
+#| label: relation-of-age-distribution-with-postcards-sent
+
+labels_pop = ind_names_df[c(7, 6), ] |>
+  clean_names() |>
+  select(indicator_name) |>
+  as_vector() |>
+  unname()
+
+names(labels_pop) = ind_names_df[c(7, 6), ] |>
+  clean_names() |>
+  mutate(indicator_code = snakecase::to_snake_case(indicator_code)) |>
+  select(indicator_code) |>
+  as_vector() |>
+  unname()
+
+names(labels_pop)[2] = "sp_pop_65up_to_zs"
+
+df |> 
+  filter(members >= 50) |>
+  select(country_name, postcard_per_mem, 
+         sp_pop_0014_to_zs, sp_pop_65up_to_zs) |>
+  pivot_longer(cols = -c(country_name, postcard_per_mem),
+               names_to = "indicator",
+               values_to = "value") |>
+  ggplot(aes(x = value,
+             y = postcard_per_mem,
+             label = country_name)) +
+  geom_smooth(col = "lightgrey", 
+              alpha = 0.2,
+              se = FALSE,
+              lwd = 2) +
+  geom_point(size = 0.8, 
+             alpha = 0.75) +
+  theme_classic() +
+  ggrepel::geom_text_repel(size = 2) +
+  labs(y = "Average no. of postcards sent per member", 
+       x = NULL,
+       title = "Countries with more elderly population also send more postcards, on average",
+       subtitle = "The converse is also true: more young people in the population correlates with lower number postcards per member") +
+  facet_wrap(~ indicator,
+             scales = "free_x",
+             strip.position = "bottom",
+             labeller = labeller(indicator = labels_pop)) +
+  theme(plot.title.position = "plot")
+```
+
+```{r}
+#| label: postcrossers-top-100
+
+pc_rk_usr = read_csv("ranked_users_all_time.csv") |>
+  clean_names() |>
+  mutate(
+    username = str_remove(username, pattern = "\xa0"),
+    country  = str_remove(country,  pattern = "\xa0")
+  )
+pc_rk_usr |>
+  group_by(country) |>
+  summarise(
+    nos = n(),
+    postcards_sent = sum(postcards_sent)
+  ) |>
+  filter(nos >= 3) |>
+  mutate(col_cn = case_when(
+    country == "U.S.A." ~ "A",
+    country == "Germany" ~ "B",
+    .default = "C"
+  )) |>
+  ggplot(aes(y = reorder(country, nos),
+             x = nos,
+             fill = col_cn)) +
+  geom_bar(stat = "identity") +
+  theme_minimal() +
+  labs(x = "Number of people in top 100 postcrossers of all time",
+       y = NULL,
+       title = "Germany has most amongst top 100 postcrossers of all time") +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        plot.title.position = "plot",
+        legend.position = "none") +
+  scale_fill_brewer(palette = "Set1")
+```
+
+```{r}
+#| label: postcrossers-top-100-last-60-days
+
+pc_rk_usr_60 = read_csv("ranked_users_last_60_days.csv") |>
+  clean_names() |>
+  select(-x2) |>
+  mutate(
+    username = str_remove(username, pattern = "\xa0"),
+    country  = str_remove(country,  pattern = "\xa0")
+  )
+
+pc_rk_usr_60 |>
+  group_by(country) |>
+  summarise(
+    nos = n(),
+    postcards_sent = sum(postcards_sent_in_last_60_days)
+  ) |>
+  filter(nos >= 2) |>
+  mutate(col_cn = case_when(
+    country == "U.S.A." ~ "A",
+    country == "Germany" ~ "B",
+    .default = "C"
+  )) |>
+  ggplot(aes(y = reorder(country, nos),
+             x = nos,
+             fill = col_cn)) +
+  geom_bar(stat = "identity") +
+  theme_minimal() +
+  labs(x = "Number of people in top 100 postcrossers of all time",
+       y = NULL,
+       title = "But, in last 60 days, USA has the most amongst top 100 postcrossers of all time") +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        plot.title.position = "plot",
+        legend.position = "none") +
+  scale_fill_brewer(palette = "Set1")
+```
+
+Looking closely at the *postcrossers* who figure both in the **Top 100 of all time** and **Top 100 of last 60 days**
+
+```{r}
+#| label: change-of-ranks-in-top-100-alltime-60days
+
+top_usr_60 = pc_rk_usr_60$username %in% pc_rk_usr$username
+top_usr = pc_rk_usr$username %in% pc_rk_usr_60$username
+
+top_users = inner_join(
+  pc_rk_usr_60 |>
+  filter(top_usr_60) |>
+  arrange(rank),
+  
+  pc_rk_usr |>
+  filter(top_usr) |>
+  arrange(rank),
+  
+  by = join_by("username")
+  ) |>
+  rename(
+  rank_last_60_days = rank.x,
+  rank_all_time = rank.y,
+  country = country.x 
+  ) |>
+  select(-country.y)
+
+top_users |>
+  select(-c(postcards_sent_in_last_60_days, postcards_sent)) |>
+  pivot_longer(
+    cols = -c(username, country),
+    names_to = "which_rank",
+    values_to = "rank"
+  ) |>
+  mutate(which_rank = fct(which_rank,
+                          levels = c(
+                            "rank_all_time",
+                            "rank_last_60_days"
+                          ))) |>
+  mutate(col_cn = case_when(
+    country == "Germany" ~ "A",
+    country == "U.S.A." ~ "B",
+    .default = "C"
+  )) |>
+  ggplot(aes(x = which_rank,
+             y = rank,
+             label = paste0(rank, ".", country),
+             group = username,
+             col = col_cn)) +
+  geom_line() +
+  geom_label(
+    nudge_x = 0,
+    nudge_y = -0.1,
+    label.padding = unit(0.15, "lines"),
+    label.r = unit(0.25, "lines"),
+    label.size = 0.15,
+    size = 3) +
+  theme_minimal() +
+  coord_cartesian(ylim = c(20, 1)) +
+  scale_y_continuous(breaks = c(20, 10, 1)) +
+  scale_color_brewer(palette = "Set1") +
+  theme(legend.position = "none",
+        panel.grid = element_blank(),
+        axis.text.y = element_blank()) +
+  labs(x = NULL, 
+       y = NULL,
+       title = "In top-rankers, Americans are sending more postcards lately",
+       subtitle = "Looking at the users who figure in both the all time top 100 and last 60 days top 100 ranks,\nwe find that Americans have moved up and Germans have fallen in ranks") +
+  scale_x_discrete(labels = c(
+    "Ranks - All Time",
+    "Ranks - in the last 60 days"
+  ))
+  
 ```
