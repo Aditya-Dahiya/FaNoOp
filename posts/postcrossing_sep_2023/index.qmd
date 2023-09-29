@@ -1,7 +1,7 @@
 ---
 title: "Postcrossing by the Numbers: Discovering the Global Postcard Exchange"
 author: "Aditya Dahiya"
-date: "2023-09-24"
+date: "2023-09-29"
 categories: [analysis]
 image: "logo.png"
 editor_options: 
@@ -11,12 +11,64 @@ execute:
   error: false
   message: false
   warning: false
+filters:
+  - social-share
+share:
+  permalink: "https://aditya-dahiya.github.io/FaNoOp/posts/postcrossing_sep_2023/"
+  description: "Postcrossing by the Numbers: Discovering the Global Postcard Exchange"
+  twitter: true
+  facebook: true
+  linkedin: true
+  email: true
 ---
 
 Hey there, data explorers and globe-trotters of knowledge! Welcome to another exciting expedition into the world of data on *FaNoOp*. Today, we're embarking on a journey through the captivating realm of [**Postcrossing.com**](https://www.postcrossing.com/) -- the global hub where postcards find their way to far-flung corners of the Earth.
 
 Ever wondered who's behind those postcards, where they're coming from, and what tales they carry? We're about to dive headfirst into a treasure trove of statistics that will reveal who the *Postcrossing community* truly is.
 
+### First, a look at the World of postcards and post-crossers:
+
+### **Percentage of country's population that uses [postcrossing.com](https://www.postcrossing.com/)**
+
+```{r}
+#| label: Attempt at the World Map Chloropleth 
+#| eval: false 
+#| output: false  
+
+world = map_data("world")  
+mapdf = left_join(world, df,                    
+                  by = join_by("region" == "country_name")) |>   
+  filter(region != "Antarctica")  
+
+names(mapdf) 
+
+mapdf |> distinct(region)  
+ggplot() +    
+  geom_map(data = mapdf,            
+           map = mapdf,            
+           mapping = aes(x = long,                          
+                         y = lat,                          
+                         map_id = region,                          
+                         fill = prop_members*100)) +   
+  theme_void() +   
+  theme(legend.position = "bottom") +   
+  labs(fill = "% population using postcrossing") +   
+  scale_fill_viridis_c(option = "rocket", direction = -1)}
+```
+
+```{=html}
+<iframe title="" aria-label="Map" id="datawrapper-chart-UxjrO" src="https://datawrapper.dwcdn.net/UxjrO/1/" scrolling="no" frameborder="0" style="width: 0; min-width: 100% !important; border: none;" height="294" data-external="1"></iframe><script type="text/javascript">!function(){"use strict";window.addEventListener("message",(function(a){if(void 0!==a.data["datawrapper-height"]){var e=document.querySelectorAll("iframe");for(var t in a.data["datawrapper-height"])for(var r=0;r<e.length;r++)if(e[r].contentWindow===a.source){var i=a.data["datawrapper-height"][t]+"px";e[r].style.height=i}}}))}(); </script>
+```
+### **Total Postcards Sent by people from each Country**
+
+```{=html}
+<iframe title="" aria-label="Map" id="datawrapper-chart-mxe0K" src="https://datawrapper.dwcdn.net/mxe0K/1/" scrolling="no" frameborder="0" style="width: 0; min-width: 100% !important; border: none;" height="294" data-external="1"></iframe><script type="text/javascript">!function(){"use strict";window.addEventListener("message",(function(a){if(void 0!==a.data["datawrapper-height"]){var e=document.querySelectorAll("iframe");for(var t in a.data["datawrapper-height"])for(var r=0;r<e.length;r++)if(e[r].contentWindow===a.source){var i=a.data["datawrapper-height"][t]+"px";e[r].style.height=i}}}))}(); </script>
+```
+### **Average number of postcards sent by each member in a country**
+
+```{=html}
+<iframe title="" aria-label="Map" id="datawrapper-chart-rCTPQ" src="https://datawrapper.dwcdn.net/rCTPQ/1/" scrolling="no" frameborder="0" style="width: 0; min-width: 100% !important; border: none;" height="294" data-external="1"></iframe><script type="text/javascript">!function(){"use strict";window.addEventListener("message",(function(a){if(void 0!==a.data["datawrapper-height"]){var e=document.querySelectorAll("iframe");for(var t in a.data["datawrapper-height"])for(var r=0;r<e.length;r++)if(e[r].contentWindow===a.source){var i=a.data["datawrapper-height"][t]+"px";e[r].style.height=i}}}))}(); </script>
+```
 ```{r}
 #| label: setup
 
@@ -172,6 +224,8 @@ df |>
   ))
 ```
 
+As we can see, postcrossing is most popular in European countries: --
+
 ```{r}
 #| label: tbl-max-members-percentage
 #| tbl-cap-location: top
@@ -208,6 +262,8 @@ df |>
   )
 ```
 
+## Germans have sent the most postcards
+
 ```{r}
 #| label: max-postcards-sent
 
@@ -228,16 +284,19 @@ df |>
         plot.title.position = "plot") +
   labs(x = "Number of postcards sent (in millions)",
        y = NULL,
-       title = "Germany has sent the most postcards",
+       title = NULL,
        subtitle = "Postcards sent from Germany are more than combined postcards from all countries except the top 15") +
   scale_x_continuous(labels = scales::label_number_si(),
                      n.breaks = 6) +
   scale_fill_brewer(palette = "Set2")
 ```
 
+### A closer look at Germany vs. other top postcrossing nations
+
 ```{r}
 #| label: max-members
-
+#| layout-ncol: 2
+#| fig-width: 10
 
 df |>
   select(country_name,
@@ -256,15 +315,13 @@ df |>
         plot.title.position = "plot") +
   labs(x = "Postcrossing members (in thousands)",
        y = NULL,
-       title = "But, Germany doesn't have the most members on postcrossing!",
+       title = "Germany doesn't have the most members on postcrossing!",
        subtitle = "Russia, US and China have members exceeding that of Germany") +
   scale_x_continuous(labels = scales::label_number_si(),
                      n.breaks = 6) +
-  scale_fill_brewer(palette = "Set2")
-```
+  scale_fill_brewer(palette = "Set2") +
+  coord_fixed()
 
-```{r}
-#| label: postcards-per-member
 df |>
   filter(members >= 100) |>
   select(country_name,
@@ -297,7 +354,10 @@ df |>
 ```
 
 ```{r}
-#| label: max-postcards-per-person-all-countries
+#| label: STOP-max-postcards-per-person-all-countries
+#| output: false
+#| eval: false
+#| echo: false
 
 df |>
   filter(members >= 100) |>
@@ -328,8 +388,11 @@ df |>
   scale_fill_brewer(palette = "Set2")
 ```
 
+In fact, the following countries have higher percentage of their population registered as members on postcrossing. But, Germans make up for that by a combination of more postcard sent per person and a larger population.
+
 ```{r}
 #| label: prop-population-as-members
+#| fig-asp: 0.5
 
 df |>
   filter(members >= 100) |>
@@ -348,34 +411,17 @@ df |>
         legend.position = "none",
         plot.title.position = "plot") +
   labs(x = "Percentage of population that uses postcrossing (%)",
-       y = NULL,
-       title = "But, Germany does benefit in total numbers from its relatively large population.",
-       subtitle = "These 11 countries have higher percentage of their population as postcrossing members") +
+       y = NULL) +
   scale_x_continuous(labels = scales::label_number_si(),
                      n.breaks = 6) +
-  scale_fill_brewer(palette = "Set2")
+  scale_fill_brewer(palette = "Accent")
 ```
 
-```{r}
-#| label: Attempt at the World Map Chloropleth
-#| eval: false
-#| output: false
+When we look at the relation of postcards sent per member to the ageing of population in countries, we find that: --
 
-world = map_data("world")
+-   Countries with more elderly population also send more postcards, on average
 
-mapdf = left_join(world, df, 
-                  by = join_by("region" == "country_name"))
-names(mapdf)
-ggplot() + 
-  geom_map(data = mapdf,
-           map = mapdf,
-           mapping = aes(x = long,
-                         y = lat,
-                         map_id = region,
-                         fill = prop_members))
-```
-
-### Relation of postcards sent per member to the ageing of population in countries:
+-   The converse is also true: more young people in the population correlates with lower number postcards per member.
 
 ```{r}
 #| label: relation-of-age-distribution-with-postcards-sent
@@ -414,9 +460,7 @@ df |>
   theme_classic() +
   ggrepel::geom_text_repel(size = 2) +
   labs(y = "Average no. of postcards sent per member", 
-       x = NULL,
-       title = "Countries with more elderly population also send more postcards, on average",
-       subtitle = "The converse is also true: more young people in the population correlates with lower number postcards per member") +
+       x = NULL) +
   facet_wrap(~ indicator,
              scales = "free_x",
              strip.position = "bottom",
@@ -424,8 +468,11 @@ df |>
   theme(plot.title.position = "plot")
 ```
 
+### And, we take a closer look at the top 100 postcrossers - of all time and of last 60 days: --
+
 ```{r}
 #| label: postcrossers-top-100
+#| fig-asp: 0.5
 
 pc_rk_usr = read_csv("ranked_users_all_time.csv") |>
   clean_names() |>
@@ -433,6 +480,14 @@ pc_rk_usr = read_csv("ranked_users_all_time.csv") |>
     username = str_remove(username, pattern = "\xa0"),
     country  = str_remove(country,  pattern = "\xa0")
   )
+pc_rk_usr_60 = read_csv("ranked_users_last_60_days.csv") |>
+  clean_names() |>
+  select(-x2) |>
+  mutate(
+    username = str_remove(username, pattern = "\xa0"),
+    country  = str_remove(country,  pattern = "\xa0")
+  )
+
 pc_rk_usr |>
   group_by(country) |>
   summarise(
@@ -458,18 +513,6 @@ pc_rk_usr |>
         plot.title.position = "plot",
         legend.position = "none") +
   scale_fill_brewer(palette = "Set1")
-```
-
-```{r}
-#| label: postcrossers-top-100-last-60-days
-
-pc_rk_usr_60 = read_csv("ranked_users_last_60_days.csv") |>
-  clean_names() |>
-  select(-x2) |>
-  mutate(
-    username = str_remove(username, pattern = "\xa0"),
-    country  = str_remove(country,  pattern = "\xa0")
-  )
 
 pc_rk_usr_60 |>
   group_by(country) |>
@@ -498,10 +541,12 @@ pc_rk_usr_60 |>
   scale_fill_brewer(palette = "Set1")
 ```
 
-Looking closely at the *postcrossers* who figure both in the **Top 100 of all time** and **Top 100 of last 60 days**
+Looking closely at the *postcrossers* who figure both in the **Top 100 of all time** and **Top 100 of last 60 days,** we find that in the top 100, Americans are rising in ranks lately. Amongst users who figure in both the all time top 100 and last 60 days lists of top 100, Americans have moved up and Germans have fallen in ranks.
 
 ```{r}
 #| label: change-of-ranks-in-top-100-alltime-60days
+#| fig-asp: 1.2
+#| fig-width: 7
 
 top_usr_60 = pc_rk_usr_60$username %in% pc_rk_usr$username
 top_usr = pc_rk_usr$username %in% pc_rk_usr_60$username
@@ -546,7 +591,7 @@ top_users |>
              label = paste0(rank, ".", country),
              group = username,
              col = col_cn)) +
-  geom_line() +
+  geom_line(alpha = 0.5, linetype = 2) +
   geom_label(
     nudge_x = 0,
     nudge_y = -0.1,
@@ -555,19 +600,18 @@ top_users |>
     label.size = 0.15,
     size = 3) +
   theme_minimal() +
-  coord_cartesian(ylim = c(20, 1)) +
-  scale_y_continuous(breaks = c(20, 10, 1)) +
+  coord_cartesian(ylim = c(40, 1)) +
+  scale_y_continuous(breaks = c(40, 30, 20, 10, 1)) +
   scale_color_brewer(palette = "Set1") +
   theme(legend.position = "none",
         panel.grid = element_blank(),
         axis.text.y = element_blank()) +
   labs(x = NULL, 
-       y = NULL,
-       title = "In top-rankers, Americans are sending more postcards lately",
-       subtitle = "Looking at the users who figure in both the all time top 100 and last 60 days top 100 ranks,\nwe find that Americans have moved up and Germans have fallen in ranks") +
+       y = NULL) +
   scale_x_discrete(labels = c(
     "Ranks - All Time",
     "Ranks - in the last 60 days"
   ))
-  
 ```
+
+### 
