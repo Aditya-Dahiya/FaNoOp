@@ -28,7 +28,7 @@ Ever wondered who's behind those postcards, where they're coming from, and why s
 
 ### First, an overview of the World of postcards and post-crossers:
 
-### **Percentage of country's population that uses [postcrossing.com](https://www.postcrossing.com/)**
+### **Percentage of country's population that uses postcrossing.com**
 
 ```{=html}
 <iframe title="" aria-label="Map" id="datawrapper-chart-UxjrO" src="https://datawrapper.dwcdn.net/UxjrO/1/" scrolling="no" frameborder="0" style="width: 0; min-width: 100% !important; border: none;" height="294" data-external="1"></iframe><script type="text/javascript">!function(){"use strict";window.addEventListener("message",(function(a){if(void 0!==a.data["datawrapper-height"]){var e=document.querySelectorAll("iframe");for(var t in a.data["datawrapper-height"])for(var r=0;r<e.length;r++)if(e[r].contentWindow===a.source){var i=a.data["datawrapper-height"][t]+"px";e[r].style.height=i}}}))}(); </script>
@@ -638,7 +638,29 @@ We use the following variables as predictors in our model to predict the Average
 When we analyze the predictors, the results are shown in @tbl-regression-1 . It seems that only the GDP per capita correlates with the Average number of postcards sent by a member in each country. Being elderly or young has no correlation with the Average number of postcards sent.
 
 ```{r}
-#| label: tb-regression-1
+df_reg |>
+  filter(members >= 100) |>
+  ggplot(aes(x = ny_gdp_pcap_pp_cd,
+             y = postcard_per_mem,
+             label = country_name)) +
+  geom_smooth(lwd = 2, 
+              col = "grey", alpha = 0.3,
+              method = "lm") +
+  geom_point() +
+  ggrepel::geom_text_repel(max.iter = 100,
+                           size = 3) +
+  scale_y_continuous() + 
+  scale_x_continuous(labels = scales::label_number_si()) +
+  theme_minimal() +
+  theme(panel.grid.minor = element_blank()) +
+  labs(x = "GDP per capita (current US$)",
+       y = "Average Number of postcards sent by each member",
+       subtitle = "Average number of postcards sent correlates with the wealth of the country, i.e., GDP per capita")
+```
+
+```{r}
+#| label: tbl-regression-1
+#| tbl-cap: "GDP per capita is the most important predictor of average number of postcards sent by each member"
 #| results: asis
 
 reg1 = df_reg |>
@@ -706,12 +728,13 @@ stargazer::stargazer(fit1, fit2, fit3, fit4,
                      )
 ```
 
-Now, lets try to see what could explain the different number of members in different countries, i.e. Percentage of the population that is registered on [postcrossing.com](www.postcrossing.com). We see that the most important predictor of postcrossing member's proportion in a population is the share of elderly population. Also, we see the fast growing populations have lower postcrossing members.
+Now, lets try to see what could explain the different number of members in different countries, i.e. Percentage of the population that is registered on [postcrossing.com](www.postcrossing.com). We see in @tbl-regression-2 that the most important predictor of postcrossing member's proportion in a population is the share of elderly population. Also, we see the fast growing populations have lower postcrossing members.
 
 All is strongly indicates that postcrossing members' numbers is primarily correlated with an elderly population which is slow growing.
 
 ```{r}
 #| label: tbl-regression-2
+#| tbl-cap: "Regressions results indicate importance of elderly population and population growth rate in predicting the number of members who use postcrossing"
 #| results: asis
 
 # A vector to dcide which covariates and the dependent variable to select
@@ -770,4 +793,50 @@ stargazer::stargazer(fit1, fit2, fit3, fit4,
                      type = ifelse(knitr::is_latex_output(),"latex", "html")
                      )
 
+```
+
+### Lastly, some interesting correlations: --
+
+#### There seems to be no apparent co-relation between the number of people within a country using postcrossing, and the average number of postcards sent by each person.
+
+```{r}
+df_reg |>
+  filter(members >= 100) |>
+  ggplot(aes(x = members,
+             y = postcard_per_mem,
+             label = country_name)) +
+  geom_smooth(se = FALSE, lwd = 2, col = "grey", alpha = 0.7,
+              method = "lm") +
+  geom_point() +
+  ggrepel::geom_text_repel(max.iter = 100,
+                           size = 3) +
+  scale_y_continuous() + 
+  scale_x_continuous(trans = "log10", 
+                     labels = scales::label_number_si()) +
+  theme_minimal() +
+  theme(panel.grid.minor = element_blank()) +
+  labs(x = "Number of postcrossing members (on log scale)",
+       y = "Average Number of postcards sent by each member")
+```
+
+#### However, as the percentage of population using postcrossing grows, so does the average number of postcards sent by each person.
+
+```{r}
+df_reg |>
+  filter(members >= 100) |>
+  ggplot(aes(x = prop_members * 100,
+             y = postcard_per_mem,
+             label = country_name)) +
+  geom_smooth(se = FALSE, lwd = 2, 
+              col = "grey", alpha = 0.7,
+              method = "lm") +
+  geom_point() +
+  ggrepel::geom_text_repel(max.iter = 100,
+                           size = 3) +
+  scale_y_continuous() + 
+  scale_x_continuous() +
+  theme_minimal() +
+  theme(panel.grid.minor = element_blank()) +
+  labs(x = "Percentage of population using postcrossing",
+       y = "Average Number of postcards sent by each member")
 ```
