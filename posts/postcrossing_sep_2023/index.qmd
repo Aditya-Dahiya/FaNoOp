@@ -22,39 +22,13 @@ share:
   email: true
 ---
 
-Hey there, data explorers and globe-trotters of knowledge! Welcome to another exciting expedition into the world of data on *FaNoOp*. Today, we're embarking on a journey through the captivating realm of [**Postcrossing.com**](https://www.postcrossing.com/) -- the global hub where postcards find their way to far-flung corners of the Earth.
+Today, we're embarking on a journey through the captivating realm of [**Postcrossing.com**](https://www.postcrossing.com/) -- the global hub where postcards find their way to far-flung corners of the Earth.
 
-Ever wondered who's behind those postcards, where they're coming from, and what tales they carry? We're about to dive headfirst into a treasure trove of statistics that will reveal who the *Postcrossing community* truly is.
+Ever wondered who's behind those postcards, where they're coming from, and why some countries send more postcards than others? We're about to dive headfirst into a treasure trove of statistics that will reveal who the [*Postcrossing*](https://www.postcrossing.com/) *community* truly is.
 
-### First, a look at the World of postcards and post-crossers:
+### First, an overview of the World of postcards and post-crossers:
 
 ### **Percentage of country's population that uses [postcrossing.com](https://www.postcrossing.com/)**
-
-```{r}
-#| label: Attempt at the World Map Chloropleth 
-#| eval: false 
-#| output: false  
-
-world = map_data("world")  
-mapdf = left_join(world, df,                    
-                  by = join_by("region" == "country_name")) |>   
-  filter(region != "Antarctica")  
-
-names(mapdf) 
-
-mapdf |> distinct(region)  
-ggplot() +    
-  geom_map(data = mapdf,            
-           map = mapdf,            
-           mapping = aes(x = long,                          
-                         y = lat,                          
-                         map_id = region,                          
-                         fill = prop_members*100)) +   
-  theme_void() +   
-  theme(legend.position = "bottom") +   
-  labs(fill = "% population using postcrossing") +   
-  scale_fill_viridis_c(option = "rocket", direction = -1)}
-```
 
 ```{=html}
 <iframe title="" aria-label="Map" id="datawrapper-chart-UxjrO" src="https://datawrapper.dwcdn.net/UxjrO/1/" scrolling="no" frameborder="0" style="width: 0; min-width: 100% !important; border: none;" height="294" data-external="1"></iframe><script type="text/javascript">!function(){"use strict";window.addEventListener("message",(function(a){if(void 0!==a.data["datawrapper-height"]){var e=document.querySelectorAll("iframe");for(var t in a.data["datawrapper-height"])for(var r=0;r<e.length;r++)if(e[r].contentWindow===a.source){var i=a.data["datawrapper-height"][t]+"px";e[r].style.height=i}}}))}(); </script>
@@ -78,6 +52,7 @@ library(gt)
 library(gtExtras)
 library(ggthemes)
 library(scales)
+library(corrplot)
 ```
 
 ```{r}
@@ -150,6 +125,41 @@ df = inner_join(cps, wb_countries, by = join_by("country_name")) |>
   relocate(pc_pop_estimate, 
            .before = pop_check) |>
   select(-code)
+
+wb_regression_vars = read_csv("wb_regression_vars.csv", 
+                               col_types = cols(`2022 [YR2022]` = col_number())) |>
+  janitor::clean_names()
+
+reg_vars = wb_regression_vars |>
+  distinct(series_name, series_code) |>
+  drop_na() |>
+  mutate(series_code = snakecase::to_snake_case(series_code)) |>
+  mutate(series_code = ifelse(series_code == "sp_pop_65_up_to_zs",
+                              "sp_pop_65up_to_zs",
+                              series_code))
+
+reg_vars_df = wb_regression_vars |>
+  drop_na() |>
+  select(-series_name, -country_code) |>
+  pivot_wider(id_cols = country_name,
+              names_from = series_code,
+              values_from = x2022_yr2022) |>
+  clean_names()
+
+df_reg = inner_join(df, reg_vars_df,
+           by = join_by(country_name)) |>
+  select(-c(se_adt_litr_zs, se_prm_cmpt_zs))
+
+
+reg_vars = bind_rows(
+  reg_vars,
+  ind_names_df |>
+    clean_names() |>
+    mutate(indicator_code = snakecase::to_snake_case(indicator_code)) |>
+    rename(series_name = indicator_name,
+           series_code = indicator_code)
+)
+
 ```
 
 ```{r}
@@ -182,9 +192,7 @@ df |>
 ### The complete data on the postcards sent by Postcrossers across the globe:
 
 ```{r}
-#| label: tbl-max-postcards-per-member
-#| tbl-cap-location: top
-#| tbl-cap: "Data on Countries' population, postcards and members"
+#| label: max-postcards-per-member
 
 df |>
   filter(members >= 100) |>
@@ -291,21 +299,45 @@ df |>
   scale_fill_brewer(palette = "Set2")
 ```
 
-### A closer look at Germany vs. other top postcrossing nations
+### A closer look at Germany vs. other top postcrossing nations.
+
+While Germany doesn't have the maximum number of members on postcrossing, it makes up by sending more postcards on average, per member.
 
 ```{r}
 #| label: max-members
-#| layout-ncol: 2
-#| fig-width: 10
 
-df |>
+x1 = df |>
   select(country_name,
          members) |>
   arrange(desc(members)) |>
   slice_head(n = 10) |>
-  mutate(col_cn = country_name == "Germany") |>
-  ggplot(aes(y = reorder(country_name, members),
-             x = members,
+  mutate(col_cn = country_name == "Germany")
+
+x2 = df |>
+  filter(members >= 100) |>
+  select(country_name,
+         members,
+         postcard_per_mem) |>
+  arrange(desc(members)) |>
+  slice_head(n = 10) |>
+  mutate(postcard_per_mem = round(postcard_per_mem, 1))  
+
+inner_join(x1, x2) |>
+  arrange(desc(members)) |>
+  rename(
+    "Postcrossing members (in thousands)" = members,
+    "Average postcards sent (per member)" = postcard_per_mem
+  ) |>
+  rownames_to_column(var = "reorder_pc") |>
+  pivot_longer(cols = -c(country_name, col_cn, reorder_pc), 
+               names_to = "names_pc",
+               values_to = "value_pc") |>
+  mutate(
+    reorder_pc = as.numeric(reorder_pc),
+    country_name = fct_reorder(country_name, desc(reorder_pc))
+  ) |>
+  ggplot(aes(y = country_name,
+             x = value_pc,
              fill = col_cn)) +
   geom_bar(stat = "identity") +
   theme_minimal() +
@@ -313,44 +345,18 @@ df |>
         panel.grid.minor = element_blank(),
         legend.position = "none",
         plot.title.position = "plot") +
-  labs(x = "Postcrossing members (in thousands)",
-       y = NULL,
-       title = "Germany doesn't have the most members on postcrossing!",
-       subtitle = "Russia, US and China have members exceeding that of Germany") +
+  labs(x = NULL,
+       y = NULL) +
   scale_x_continuous(labels = scales::label_number_si(),
                      n.breaks = 6) +
   scale_fill_brewer(palette = "Set2") +
-  coord_fixed()
+  facet_wrap(~ fct(names_pc, 
+                   levels = c("Postcrossing members (in thousands)",
+                              "Average postcards sent (per member)")), 
+             scales = "free_x",
+             strip.position = "top") +
+    theme(strip.text.x = element_text(size = 12))
 
-df |>
-  filter(members >= 100) |>
-  select(country_name,
-         members,
-         postcard_per_mem) |>
-  arrange(desc(members)) |>
-  slice_head(n = 10) |>
-  mutate(postcard_per_mem = round(postcard_per_mem, 0)) |>
-  mutate(col_cn = country_name == "Germany") |>
-  ggplot(aes(y = reorder(country_name, members),
-             x = postcard_per_mem,
-             fill = col_cn,
-             label = postcard_per_mem)) +
-  geom_bar(stat = "identity") +
-  geom_text(hjust = -0.5,
-            size = 3) +
-  theme_minimal() +
-  theme(panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank(),
-        legend.position = "none",
-        plot.title.position = "plot") +
-  labs(x = "Average postcards sent (per member)",
-       y = NULL,
-       title = "However, Germans make up for that by sending more postcards on average!",
-       subtitle = "amongst the top 10 countries, in terms of members.") +
-  scale_x_continuous(labels = scales::label_number_si(),
-                     n.breaks = 6,
-                     limits = c(0, 250)) +
-  scale_fill_brewer(palette = "Set2")
 ```
 
 ```{r}
@@ -417,14 +423,17 @@ df |>
   scale_fill_brewer(palette = "Accent")
 ```
 
-When we look at the relation of postcards sent per member to the ageing of population in countries, we find that: --
+## Do the elderly send more postcards?
+
+When we look at the relation of postcards sent per member to the ageing of population in countries, we find: --
 
 -   Countries with more elderly population also send more postcards, on average
 
--   The converse is also true: more young people in the population correlates with lower number postcards per member.
+-   Coutnries with higher proportion of young people in the population send fewer postcards per member, on average.
 
 ```{r}
 #| label: relation-of-age-distribution-with-postcards-sent
+#| fig-width: 10
 
 labels_pop = ind_names_df[c(7, 6), ] |>
   clean_names() |>
@@ -614,4 +623,151 @@ top_users |>
   ))
 ```
 
-### 
+### Finally, let's delve into other indicators that could explain why some countries send more postcards than others !
+
+We use the following variables as predictors in our model to predict the Average number of postcards sent by a member in each country: --
+
+-   Age dependency ratio, old (% of working-age population),
+
+-   Population ages 65 and above (% of total population),
+
+-   Population ages 0-14 (% of total population),
+
+-   GDP per capita (current US\$)
+
+When we analyze the predictors, the results are shown in @tbl-regression-1 . It seems that only the GDP per capita correlates with the Average number of postcards sent by a member in each country. Being elderly or young has no correlation with the Average number of postcards sent.
+
+```{r}
+#| label: tb-regression-1
+#| results: asis
+
+reg1 = df_reg |>
+  select(postcard_per_mem, 
+         sp_pop_65up_to_zs.x,
+         sp_pop_0014_to_zs.x,
+         sp_pop_dpnd_ol,
+         ny_gdp_pcap_cd,
+         ny_gdp_pcap_pp_cd) |>
+  drop_na() |>
+  filter(postcard_per_mem <= 10000000) |>
+  rename(
+    "sp_pop_65up_to_zs" = "sp_pop_65up_to_zs.x",
+    "sp_pop_0014_to_zs" = "sp_pop_0014_to_zs.x"
+  )
+
+model1_vars = reg_vars |>
+  filter(series_code %in% 
+           c("sp_pop_65up_to_zs",
+             "sp_pop_0014_to_zs",
+             "sp_pop_dpnd_ol",
+             "ny_gdp_pcap_cd")) |>
+  arrange(desc(series_code))
+  
+indvars_model1 = model1_vars |>
+            select(series_code) |>
+            as_vector() |>
+            unname()
+
+f1 = paste0("postcard_per_mem ~ ", 
+            indvars_model1)
+f1all = paste0("postcard_per_mem ~ ", 
+               str_flatten(
+                 indvars_model1,
+                 collapse = " + "
+               ))
+covar1_label = model1_vars |>
+  select(series_name) |>
+  as_vector() |>
+  unname()
+
+fit1 = lm(f1[1], data = reg1)
+fit2 = lm(f1[2], data = reg1)
+fit3 = lm(f1[3], data = reg1)
+fit4 = lm(f1[4] , data = reg1)
+fit5 = lm(postcard_per_mem ~ sp_pop_0014_to_zs + ny_gdp_pcap_cd, data = reg1)
+fit6 = lm(postcard_per_mem ~ sp_pop_65up_to_zs + ny_gdp_pcap_cd, data = reg1)
+fit7 = lm(postcard_per_mem ~ sp_pop_dpnd_ol + ny_gdp_pcap_cd, data = reg1)
+fit8 = lm(f1all, data = reg1)
+
+stargazer::stargazer(fit1, fit2, fit3, fit4,
+                     fit5, fit6, fit7, fit8,
+                     title = "Regression results",
+                     column.separate = c(4,3,1),
+                     column.labels = c("Bi-variable models", "Two variables", "All vars"),
+                     dep.var.labels.include = FALSE,
+                     df = FALSE,
+                     digits = 1,
+                     font.size = "small",
+                     keep.stat = c("f", "adj.rsq"),
+                     omit = c("Constant"),
+                     covariate.labels = covar1_label,
+                     dep.var.caption = "Average number of postcards sent by each member",
+                     type = ifelse(knitr::is_latex_output(),"latex", "html")
+                     )
+```
+
+Now, lets try to see what could explain the different number of members in different countries, i.e. Percentage of the population that is registered on [postcrossing.com](www.postcrossing.com). We see that the most important predictor of postcrossing member's proportion in a population is the share of elderly population. Also, we see the fast growing populations have lower postcrossing members.
+
+All is strongly indicates that postcrossing members' numbers is primarily correlated with an elderly population which is slow growing.
+
+```{r}
+#| label: tbl-regression-2
+#| results: asis
+
+# A vector to dcide which covariates and the dependent variable to select
+reg2_vars = names(df_reg)[c(5, 4, 7, 9, 17, 18)]
+
+# Create regression usable df
+reg2_df = df_reg |>
+  select(reg2_vars) |>
+  drop_na() |>
+  rename("sp_pop_65up_to_zs" = "sp_pop_65up_to_zs.x")
+
+# Tibble for names of covariates
+indvars_model2 = reg_vars |>
+  filter(series_code %in% names(reg2_df)) |>
+  arrange(series_code)
+
+# Formulas for single covariate models
+f2 = paste0("prop_members ~ ", 
+            indvars_model2$series_code)
+f2all = paste0("prop_members ~ ", 
+               str_flatten(
+                 indvars_model2$series_code,
+                 collapse = " + "
+               ))
+
+# Labels vector for stargazer
+covar2_label = indvars_model2 |>
+  select(series_name) |>
+  as_vector() |>
+  unname()
+
+# Regression models
+fit1 = lm(f2[1], data = reg2_df)
+fit2 = lm(f2[2], data = reg2_df)
+fit3 = lm(f2[3], data = reg2_df)
+fit4 = lm(f2[4], data = reg2_df)
+fit5 = lm(f2[5], data = reg2_df)
+fit6 = lm("prop_members ~ ny_gdp_pcap_cd + sp_pop_65up_to_zs", data = reg2_df)
+fit7 = lm("prop_members ~ ny_gdp_pcap_cd + sp_pop_grow", data = reg2_df)
+fit2all = lm(f2all, data = reg2_df)
+
+stargazer::stargazer(fit1, fit2, fit3, fit4,
+                     fit5, fit6, fit7, fit2all,
+                     title = "Regression results",
+                     column.separate = c(5,2,1),
+                     column.labels = c("One covariate models", 
+                                       "Two Covariates", 
+                                       "All covariates"),
+                     dep.var.labels.include = FALSE,
+                     df = FALSE,
+                     font.size = "small",
+                     keep.stat = c("f", "adj.rsq"),
+                     omit = c("Constant"),
+                     covariate.labels = covar2_label,
+                     dep.var.caption = "Postcrossing members as a proportion of population",
+                     type = ifelse(knitr::is_latex_output(),"latex", "html")
+                     )
+
+```
