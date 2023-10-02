@@ -1,7 +1,8 @@
 ---
 title: "Postcrossing by the Numbers: Discovering the Global Postcard Exchange"
+subtitle: "Analyzing Postcrossing.com data reveals how postcard sending relates to GDP, literacy, and demographics."
 author: "Aditya Dahiya"
-date: "2023-09-29"
+date: "2023-10-01"
 categories: [analysis]
 image: "logo.png"
 editor_options: 
@@ -423,13 +424,15 @@ df |>
   scale_fill_brewer(palette = "Accent")
 ```
 
-## Do the elderly send more postcards?
+### Do the elderly send more postcards? Or, is it due to some other underlying cause?
 
 When we look at the relation of postcards sent per member to the ageing of population in countries, we find: --
 
 -   Countries with more elderly population also send more postcards, on average
 
--   Coutnries with higher proportion of young people in the population send fewer postcards per member, on average.
+-   Countries with higher proportion of young people in the population send fewer postcards per member, on average.
+
+However, as we will see later, wealth (GDP per capita) explains the postcard numbers better.
 
 ```{r}
 #| label: relation-of-age-distribution-with-postcards-sent
@@ -618,9 +621,10 @@ top_users |>
   labs(x = NULL, 
        y = NULL) +
   scale_x_discrete(labels = c(
-    "Ranks - All Time",
+    "Ranks - All Time (since inception)",
     "Ranks - in the last 60 days"
-  ))
+  ),
+  position = "top")
 ```
 
 ### Finally, let's delve into other indicators that could explain why some countries send more postcards than others !
@@ -635,32 +639,11 @@ We use the following variables as predictors in our model to predict the Average
 
 -   GDP per capita (current US\$)
 
-When we analyze the predictors, the results are shown in @tbl-regression-1 . It seems that only the GDP per capita correlates with the Average number of postcards sent by a member in each country. Being elderly or young has no correlation with the Average number of postcards sent.
+When we analyze the predictors, the techincal results are shown below. It seems that only the GDP per capita correlates with the Average number of postcards sent by a member in each country. On the contrary, being elderly or young has no correlation with the Average number of postcards sent.
 
 ```{r}
-df_reg |>
-  filter(members >= 100) |>
-  ggplot(aes(x = ny_gdp_pcap_pp_cd,
-             y = postcard_per_mem,
-             label = country_name)) +
-  geom_smooth(lwd = 2, 
-              col = "grey", alpha = 0.3,
-              method = "lm") +
-  geom_point() +
-  ggrepel::geom_text_repel(max.iter = 100,
-                           size = 3) +
-  scale_y_continuous() + 
-  scale_x_continuous(labels = scales::label_number_si()) +
-  theme_minimal() +
-  theme(panel.grid.minor = element_blank()) +
-  labs(x = "GDP per capita (current US$)",
-       y = "Average Number of postcards sent by each member",
-       subtitle = "Average number of postcards sent correlates with the wealth of the country, i.e., GDP per capita")
-```
-
-```{r}
-#| label: tbl-regression-1
-#| tbl-cap: "GDP per capita is the most important predictor of average number of postcards sent by each member"
+#| label: fig-regression-1
+#| fig-cap: "GDP per capita is the most important predictor of average number of postcards sent by each member"
 #| results: asis
 
 reg1 = df_reg |>
@@ -728,13 +711,39 @@ stargazer::stargazer(fit1, fit2, fit3, fit4,
                      )
 ```
 
-Now, lets try to see what could explain the different number of members in different countries, i.e. Percentage of the population that is registered on [postcrossing.com](www.postcrossing.com). We see in @tbl-regression-2 that the most important predictor of postcrossing member's proportion in a population is the share of elderly population. Also, we see the fast growing populations have lower postcrossing members.
-
-All is strongly indicates that postcrossing members' numbers is primarily correlated with an elderly population which is slow growing.
+Thus, the most important correlation of Average number of postcards sent by a member is with wealth, the GDP per capita. This relation is depicted below in @fig-reg1 .
 
 ```{r}
-#| label: tbl-regression-2
-#| tbl-cap: "Regressions results indicate importance of elderly population and population growth rate in predicting the number of members who use postcrossing"
+#| label: fig-reg1
+#| fig-cap: "Average number of postcards sent correlates with the wealth of the country, i.e., GDP per capita"
+#| fig-cap-location: "top"
+
+df_reg |>
+  filter(members >= 100) |>
+  ggplot(aes(x = ny_gdp_pcap_pp_cd,
+             y = postcard_per_mem,
+             label = country_name)) +
+  geom_smooth(lwd = 2, 
+              col = "grey", alpha = 0.3,
+              method = "lm") +
+  geom_point() +
+  ggrepel::geom_text_repel(max.iter = 100,
+                           size = 3) +
+  scale_y_continuous() + 
+  scale_x_continuous(labels = scales::label_number_si()) +
+  theme_minimal() +
+  theme(panel.grid.minor = element_blank()) +
+  labs(x = "GDP per capita (current US$)",
+       y = "Average Number of postcards sent by each member")
+```
+
+Now, lets try to see what could explain the different number of members in different countries, i.e. Percentage of the population that is registered on [postcrossing.com](www.postcrossing.com). We see in the table below that the most important predictor of postcrossing member's proportion in a population is the share of elderly population. Also, we see the fast growing populations have lower postcrossing members.
+
+All this strongly indicates that number of postcrossing members is correlated with an elderly population, and a slow growing population.
+
+```{r}
+#| label: fig-regression-2
+#| fig-cap: "Regressions results indicate importance of elderly population and population growth rate in predicting the number of members who use postcrossing"
 #| results: asis
 
 # A vector to dcide which covariates and the dependent variable to select
@@ -840,3 +849,15 @@ df_reg |>
   labs(x = "Percentage of population using postcrossing",
        y = "Average Number of postcards sent by each member")
 ```
+
+## The bottom line: --
+
+1.  Postcrossing is most popular in nordic and eastern European countries, and catching up in USA and China.
+
+2.  Countries with higher percentage of elderly people also have higher percentage of population registered on postcrossing.
+
+3.  Being elderly or young has no correlation with the number of postcards sent. Instead, it is wealth (GDP per capita) that correlates with the number of postcards sent on average by a member, in a country.
+
+### Happy postcrossing on the World Postcards Day - October 1! 
+
+![](Postcrossing Main Logo.png){width="427"}
