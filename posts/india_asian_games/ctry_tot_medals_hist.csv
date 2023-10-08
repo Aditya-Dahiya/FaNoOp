@@ -1,0 +1,45 @@
+rank,country,gold,silver,bronze,total,code
+1,China,1473,994,720,3187,CHN
+2,Japan,1032,1037,985,3054,JPN
+3,South Korea,745,663,827,2235,KOR
+4,Iran,179,181,197,557,IRI
+5,India,155,201,316,672,IND
+6,Kazakhstan,155,158,244,557,KAZ
+7,Thailand,132,175,279,586,THA
+8,North Korea,110,144,179,433,PRK
+9,Chinese Taipei,99,144,276,519,TPE
+10,Indonesia,91,120,235,446,INA
+11,Uzbekistan,83,120,140,343,UZB
+12,Philippines,67,114,230,411,PHI
+13,Malaysia,63,101,148,312,MAS
+14,Pakistan,44,63,90,197,PAK
+15,Qatar,43,31,56,130,QAT
+16,Singapore,42,58,116,216,SIN
+17,Hong Kong,38,79,112,229,HKG
+18,Bahrain,37,25,23,85,BHR
+19,Kuwait,26,30,34,90,KUW
+20,Mongolia,25,46,91,162,MGL
+21,Saudi Arabia,25,13,23,61,KSA
+22,Vietnam,18,70,93,181,VIE
+23,Israel,18,16,19,53,ISR
+24,Myanmar,16,28,55,99,MYA
+25,Sri Lanka,11,10,20,41,SRI
+26,Syria,9,8,15,32,SYR
+27,Iraq,7,17,23,47,IRQ
+28,United Arab Emirates,7,17,17,41,UAE
+29,Jordan,5,16,24,45,JOR
+30,Lebanon,5,5,8,18,LBN
+31,Kyrgyzstan,4,23,38,65,KGZ
+32,Tajikistan,4,7,17,28,TJK
+33,Turkmenistan,3,8,12,23,TKM
+34,Cambodia,3,2,4,9,CAM
+35,Macau,2,11,20,33,MAC
+36,Bangladesh,1,5,6,12,BAN
+37,Korea,1,1,2,4,COR
+38,Oman,1,0,3,4,OMA
+39,Laos,0,4,11,15,LAO
+40,Afghanistan,0,4,7,11,AFG
+41,Nepal,0,2,22,24,NEP
+42,Brunei,0,0,4,4,BRU
+43,Yemen,0,0,2,2,YEM
+44,Palestine,0,0,1,1,PLE

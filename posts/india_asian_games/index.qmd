@@ -33,10 +33,11 @@ library(gtExtras)
 library(janitor)
 ```
 
-Retrieve data on Asian Games - total medals in each Asiad edition and total medals by all countries historically from a Wikipedia [article](https://en.wikipedia.org/wiki/All-time_Asian_Games_medal_table).
+Retrieve data on Asian Games - total medals in each Asiad edition and total medals by all countries historically from a Wikipedia [article](https://en.wikipedia.org/wiki/All-time_Asian_Games_medal_table). Using data from [India at Asian Games](https://en.wikipedia.org/wiki/India_at_the_Asian_Games) from Wikipedia.
 
 ```{r}
-#| label: Harvesting-Asian-Games-Overall-Data
+#| label: Dont-eval-Harvesting-Asian-Games-Overall-Data
+#| eval: false
 
 # Capture url, html and rvest 
 url1 <- "https://en.wikipedia.org/wiki/All-time_Asian_Games_medal_table"
@@ -47,19 +48,23 @@ list1 <- html1 |>
   html_table()
 
 # Total number of medals, gold, silver and bronze in each edition of Asiad
-total_medals_hist = list1[[1]] |>
+total_medals_hist <- list1[[1]] |>
   filter(Number != "Total") |>
   mutate_at(vars(-Number), parse_number) |>
   clean_names() |>
-  rename(asiad = number)
+  rename(asiad = number) |>
+  separate_wider_delim(cols = asiad,
+                       delim = " -",
+                       names = c(NA, "asiad")) |>
+  mutate(asiad = parse_number(asiad))
 
 # Correct the year for 2022 Asiad to 2023
 total_medals_hist[19, "year"] <- 2023
 
 # Total cumulative medals by every country from start upto 2018 Asiad
-ctry_tot_medals_hist <- list1[[2]] |>
+ctry_tot_medals_hist <- list1[[5]] |>
   mutate(
-    country = str_extract(Nation, "\\w+"),
+    country = str_replace_all(Nation, "\\s*\\(.*\\)", ""),
     code = str_extract(Nation, "\\(([^)]*)\\)"),
     code = str_sub(code, 2, nchar(code) - 1)
   ) |>
@@ -90,12 +95,31 @@ total_medals_hist[19, "bronze"] <- medals_2022 |> pull(bronze) |> sum()
 total_medals_hist[19, "total"] <- medals_2022 |> pull(total) |> sum()
 
 rm(list1, list3, html1, html3, url1, url3)
+
+write_csv(ctry_tot_medals_hist, "posts/india_asian_games/ctry_tot_medals_hist.csv")
+write_csv(medals_2022, "posts/india_asian_games/medals_2022.csv")
+write_csv(total_medals_hist, "posts/india_asian_games/total_medals_hist.csv")
 ```
 
-Using data from [India at Asian Games](https://en.wikipedia.org/wiki/India_at_the_Asian_Games) from Wikipedia: --
+Reading in the data
 
 ```{r}
-#| label: Harvesting-India-Data-at-Asian-Games
+#| label: reading-in-the-data-harvested
+
+ctry_tot_medals_hist <- read_csv("https://raw.githubusercontent.com/Aditya-Dahiya/FaNoOp/main/posts/india_asian_games/ctry_tot_medals_hist.csv")
+
+medals_2022 <- read_csv("https://raw.githubusercontent.com/Aditya-Dahiya/FaNoOp/main/posts/india_asian_games/medals_2022.csv")
+
+total_medals_hist <- read_csv("https://raw.githubusercontent.com/Aditya-Dahiya/FaNoOp/main/posts/india_asian_games/total_medals_hist.csv")
+
+ind_med_hist <- read_csv("https://raw.githubusercontent.com/Aditya-Dahiya/FaNoOp/main/posts/india_asian_games/ind_med_hist.csv")
+
+ind_tot_med_sport <- read_csv("https://raw.githubusercontent.com/Aditya-Dahiya/FaNoOp/main/posts/india_asian_games/ind_tot_med_sport.csv")
+```
+
+```{r}
+#| label: Dont-eval-Harvesting-India-Data-at-Asian-Games
+#| eval: false
 
 
 url2 <- "https://en.wikipedia.org/wiki/India_at_the_Asian_Games"
@@ -124,12 +148,15 @@ ind_tot_med_sport <- list2[[3]] |>
   filter(sport != "Total")
 
 rm(url2, html2, list2)
+
+write_csv(ind_med_hist, "posts/india_asian_games/ind_med_hist.csv")
+write_csv(ind_tot_med_sport, "posts/india_asian_games/ind_tot_med_sport.csv")
 ```
 
-Harvesting other countries and historical data from [here](https://bestsports.com.br/db/evnmedpag.php?evn=2336&lang=2), i.e., bestsports.com
+Harvesting other countries and historical data from [here](https://bestsports.com.br/db/evnmedpag.php?evn=2336&lang=2), i.e., *bestsports.com*
 
 ```{r}
-#| label: one-tim-code-only: harvest-all-countries-historical-data-bestsports.com
+#| label: one-tim-code-only-harvest-all-countries-historical-data-bestsports.com
 #| eval: false
 
 url4 <- "https://bestsports.com.br/db/evnmedpag.php?evn=2336&lang=2"
@@ -225,15 +252,16 @@ write_csv(medals_all_years, "posts/india_asian_games/medals_all_years.csv")
 ```{r}
 #| label: read-all-countries-medals-all-years
 
-medals_all_years <- read_csv("posts/india_asian_games/medals_all_years.csv")
+# Creating a data-frame of all medals over years by all countries
 
+medals_all_years <- read_csv("https://raw.githubusercontent.com/Aditya-Dahiya/FaNoOp/main/posts/india_asian_games/medals_all_years.csv") |>
+  bind_rows(medals_2022 |> mutate(year = 2023))
 ```
 
 **Analysis**
 
 ```{r}
-#| label: fig-ranks-over-years
-#| fig-cap: "India's rank in Medal Tally at Asian Games over the years"
+#| label: create-a-df1-for-india-ranks-etc.
 
 df1 <- ind_med_hist |>
   left_join(total_medals_hist,
@@ -243,6 +271,11 @@ df1 <- ind_med_hist |>
 
 lab_col = c("Hosted by India", "Hosted by other nations")
 names(lab_col) = c(TRUE, FALSE)
+```
+
+```{r}
+#| label: fig-ranks-over-years
+#| fig-cap: "India's rank in Medal Tally at Asian Games over the years"
 
 df1 |>
   mutate(hosted_india = (host_nations == "India")) |>
@@ -259,7 +292,7 @@ df1 |>
   # scale_size_discrete(labels = labeller(lab_col)) +
   # scale_color_discrete(labels = labeller(lab_col)) +
   labs(x = NULL, y = "Rank in Medals' Tally",
-       title = "India's rank has fell over the decades",
+       title = "India's rank fell over the decades",
        subtitle = "But, 2023's performance is a marked improvement: Best ever since 1962!", col = NULL, size = NULL) +
   theme(panel.grid = element_blank(),
         legend.position = "bottom")
@@ -327,8 +360,186 @@ df1 |>
   scale_y_continuous(limits = c(0, 0.365))
 ```
 
-A comparison chart for (1) China, (2) Pakistan (3) Sri Lanka (4) Indonesia (5) Uzbekistan (6) Iran
+Interactive Graph of proportion of medals won by all countries over years
 
 ```{r}
+plotly::ggplotly(
+  
+medals_all_years |>
+  group_by(year) |>
+  mutate(all_total = sum(total),
+         all_gold = sum(gold),
+         all_silver = sum(silver),
+         all_bronze = sum(bronze)) |>
+  mutate(prop_total = total/all_total,
+         prop_gold = gold/all_gold,
+         prop_silver = silver/all_silver,
+         prop_bronze = bronze/all_bronze,
+         ctry_label = if_else(year == 2023,
+                              nation,
+                              NA),
+         is_india = (nation == "India")
+         ) |>
+  filter(year > 1990) |>
+  ungroup() |>
+  rename(
+    Year = year,
+    Country = nation
+  ) |>
+  ggplot(aes(x = Year,
+             y = prop_total,
+             group = Country,
+             col = is_india,
+             alpha = is_india,
+             text = paste("Medals: ", round(prop_total*100, 1), " %")
+             )
+         ) +
+  geom_point() +
+  geom_line() +
+  scale_x_continuous(breaks = medals_all_years |>
+                     distinct(year) |> pull(year)) +
+  scale_y_continuous(labels = scales::percent) +
+  scale_color_manual(values = c("#6d6d70", "#273de3")) +
+  scale_linewidth_discrete(range = c(0.5, 1.2)) +
+  theme_minimal() +
+  theme(panel.grid = element_blank(),
+        legend.position = "none") +
+  labs(x = NULL, y = "Percentage of total medals won"),
 
+tooltip = c("group", "text", "x")
+)
+```
+
+A comparison chart for top 5 medal winning countries in Asian Games over the years: --
+
+```{r}
+com_countries = (ctry_tot_medals_hist |> pull(country))[1:5]
+
+medals_all_years |>
+  group_by(year) |>
+  mutate(all_total = sum(total),
+         all_gold = sum(gold),
+         all_silver = sum(silver),
+         all_bronze = sum(bronze)) |>
+  filter(nation %in% com_countries) |>
+  mutate(prop_total = total/all_total,
+         prop_gold = gold/all_gold,
+         prop_silver = silver/all_silver,
+         prop_bronze = bronze/all_bronze,
+         ctry_label = if_else(year == 2023,
+                              nation,
+                              NA),
+         is_india = (nation == "India")
+         ) |>
+  ungroup() |>
+  ggplot(aes(x = year,
+             y = prop_total,
+             col = nation,
+             label = ctry_label)) +
+  geom_line(aes(lwd = is_india), alpha = 0.7) +
+  geom_point(size = 1.5, alpha = 0.5) +
+  ggrepel::geom_label_repel() +
+  scale_x_continuous(breaks = medals_all_years |>
+                     distinct(year) |> pull(year)) +
+  scale_y_continuous(labels = scales::percent) +
+  scale_color_brewer(palette = "Set1") +
+  scale_linewidth_discrete(range = c(0.5, 1.2)) +
+  theme_minimal() +
+  theme(panel.grid = element_blank(),
+        legend.position = "none") +
+  labs(x = NULL, y = "Percentage of total medals won")
+```
+
+**Pie chart for medals all over the years**
+
+**Sports where India's all time medals have come from**
+
+```{=html}
+<iframe title="Share of sports in India's all-time medals at Asian Games" aria-label="Pie Chart" id="datawrapper-chart-qV2pZ" src="https://datawrapper.dwcdn.net/qV2pZ/1/" scrolling="no" frameborder="0" style="width: 0; min-width: 100% !important; border: none;" height="572" data-external="1"></iframe><script type="text/javascript">!function(){"use strict";window.addEventListener("message",(function(a){if(void 0!==a.data["datawrapper-height"]){var e=document.querySelectorAll("iframe");for(var t in a.data["datawrapper-height"])for(var r=0;r<e.length;r++)if(e[r].contentWindow===a.source){var i=a.data["datawrapper-height"][t]+"px";e[r].style.height=i}}}))}();
+</script>
+```
+**Sports from where India's Gold, Silver and Bronze Medals have come from: --**
+
+Gold Medals
+
+```{=html}
+<iframe title="Share in India's Gold Medals" aria-label="Pie Chart" id="datawrapper-chart-MauTe" src="https://datawrapper.dwcdn.net/MauTe/1/" scrolling="no" frameborder="0" style="width: 0; min-width: 100% !important; border: none;" height="500" data-external="1"></iframe><script type="text/javascript">!function(){"use strict";window.addEventListener("message",(function(a){if(void 0!==a.data["datawrapper-height"]){var e=document.querySelectorAll("iframe");for(var t in a.data["datawrapper-height"])for(var r=0;r<e.length;r++)if(e[r].contentWindow===a.source){var i=a.data["datawrapper-height"][t]+"px";e[r].style.height=i}}}))}();
+</script>
+```
+Silver Medals
+
+```{=html}
+<iframe title="Share in India's Silver Medals" aria-label="Pie Chart" id="datawrapper-chart-AkGs2" src="https://datawrapper.dwcdn.net/AkGs2/2/" scrolling="no" frameborder="0" style="width: 0; min-width: 100% !important; border: none;" height="500" data-external="1"></iframe><script type="text/javascript">!function(){"use strict";window.addEventListener("message",(function(a){if(void 0!==a.data["datawrapper-height"]){var e=document.querySelectorAll("iframe");for(var t in a.data["datawrapper-height"])for(var r=0;r<e.length;r++)if(e[r].contentWindow===a.source){var i=a.data["datawrapper-height"][t]+"px";e[r].style.height=i}}}))}();
+</script>
+```
+Bronze Medals
+
+```{=html}
+<iframe title="Share in India's Bronze Medals" aria-label="Pie Chart" id="datawrapper-chart-Ve95F" src="https://datawrapper.dwcdn.net/Ve95F/1/" scrolling="no" frameborder="0" style="width: 0; min-width: 100% !important; border: none;" height="500" data-external="1"></iframe><script type="text/javascript">!function(){"use strict";window.addEventListener("message",(function(a){if(void 0!==a.data["datawrapper-height"]){var e=document.querySelectorAll("iframe");for(var t in a.data["datawrapper-height"])for(var r=0;r<e.length;r++)if(e[r].contentWindow===a.source){var i=a.data["datawrapper-height"][t]+"px";e[r].style.height=i}}}))}();
+</script>
+```
+```{r}
+#| label: harvest-sport-wise-medals-india-2023
+#| eval: false
+
+# Capture url, html and rvest 
+url5 <- "https://en.wikipedia.org/wiki/India_at_the_2022_Asian_Games"
+html5 <- read_html(url5)
+
+list5 <- html5 |>
+  html_nodes("table") |>
+  html_table()
+
+list5[[3]] |>
+  select(X1:X5) |>
+  row_to_names(3) |>
+  slice_head(n = 22) |>
+  write_csv("posts/india_asian_games/temp4_dw.csv")
+```
+
+**Sports from where India's Total, Gold, Silver and Bronze Medals have come from in 2023 Asian Games: --**
+
+Total Medals
+
+```{=html}
+<iframe title="India's medals at 2023 Asian Games" aria-label="Pie Chart" id="datawrapper-chart-yRR2O" src="https://datawrapper.dwcdn.net/yRR2O/1/" scrolling="no" frameborder="0" style="width: 0; min-width: 100% !important; border: none;" height="572" data-external="1"></iframe><script type="text/javascript">!function(){"use strict";window.addEventListener("message",(function(a){if(void 0!==a.data["datawrapper-height"]){var e=document.querySelectorAll("iframe");for(var t in a.data["datawrapper-height"])for(var r=0;r<e.length;r++)if(e[r].contentWindow===a.source){var i=a.data["datawrapper-height"][t]+"px";e[r].style.height=i}}}))}();
+</script>
+```
+Gold Medals
+
+```{=html}
+<iframe title="India's Gold Medals at 2023 Asian Games" aria-label="Pie Chart" id="datawrapper-chart-bxxwr" src="https://datawrapper.dwcdn.net/bxxwr/1/" scrolling="no" frameborder="0" style="width: 0; min-width: 100% !important; border: none;" height="500" data-external="1"></iframe><script type="text/javascript">!function(){"use strict";window.addEventListener("message",(function(a){if(void 0!==a.data["datawrapper-height"]){var e=document.querySelectorAll("iframe");for(var t in a.data["datawrapper-height"])for(var r=0;r<e.length;r++)if(e[r].contentWindow===a.source){var i=a.data["datawrapper-height"][t]+"px";e[r].style.height=i}}}))}();
+</script>
+```
+Silver Medals
+
+```{=html}
+<iframe title="India's Silver Medals at 2023 Asian Games" aria-label="Pie Chart" id="datawrapper-chart-1zCie" src="https://datawrapper.dwcdn.net/1zCie/1/" scrolling="no" frameborder="0" style="width: 0; min-width: 100% !important; border: none;" height="500" data-external="1"></iframe><script type="text/javascript">!function(){"use strict";window.addEventListener("message",(function(a){if(void 0!==a.data["datawrapper-height"]){var e=document.querySelectorAll("iframe");for(var t in a.data["datawrapper-height"])for(var r=0;r<e.length;r++)if(e[r].contentWindow===a.source){var i=a.data["datawrapper-height"][t]+"px";e[r].style.height=i}}}))}();
+</script>
+```
+Bronze Medals
+
+```{=html}
+<iframe title="India's Bronze Medals at 2023 Asian Games" aria-label="Pie Chart" id="datawrapper-chart-8KyJh" src="https://datawrapper.dwcdn.net/8KyJh/1/" scrolling="no" frameborder="0" style="width: 0; min-width: 100% !important; border: none;" height="500" data-external="1"></iframe><script type="text/javascript">!function(){"use strict";window.addEventListener("message",(function(a){if(void 0!==a.data["datawrapper-height"]){var e=document.querySelectorAll("iframe");for(var t in a.data["datawrapper-height"])for(var r=0;r<e.length;r++)if(e[r].contentWindow===a.source){var i=a.data["datawrapper-height"][t]+"px";e[r].style.height=i}}}))}();
+</script>
+```
+Share of gold medals in India's medal over the years
+
+```{r}
+ind_med_hist |>
+  mutate(
+    share_gold = round(100*gold/total, 1),
+    year = if_else(year == 2022, 2023, year),
+    hosted = (host_nations == "India")
+  ) |>
+  ggplot(aes(x = year,
+             y = share_gold,
+             label = paste0(share_gold, " %")
+             )
+         ) +
+  ggrepel::geom_label_repel(aes(col = hosted)) +
+  geom_point(aes(col = hosted)) +
+  geom_line(lty = 2) +
+  theme_minimal() +
+  scale_x_continuous(breaks = year)
 ```
