@@ -1,8 +1,8 @@
 ---
-title: "India at Asian Games - Over the Years"
-subtitle: "Analyzing medals data on how India has performed over the years"
+title: "Breaking the Mold: India's Medal Insights from the 2023 Asian Games"
+subtitle: "The 2023 Asian Games have etched their place in India's sporting history, as the nation not only secured its highest-ever medal count but also achieved a seismic shift - moving beyond mere numbers to diversification, gold medal dominance, and a greater share of the total medals on offer."
 author: "Aditya Dahiya"
-date: "2023-10-06"
+date: "2023-10-08"
 categories: [analysis]
 image: "logo.png"
 editor_options: 
@@ -21,6 +21,9 @@ share:
   facebook: true
   linkedin: true
   email: true
+format:
+  html:
+    embed-resources: true
 ---
 
 ```{r}
@@ -33,7 +36,7 @@ library(gtExtras)
 library(janitor)
 ```
 
-Retrieve data on Asian Games - total medals in each Asiad edition and total medals by all countries historically from a Wikipedia [article](https://en.wikipedia.org/wiki/All-time_Asian_Games_medal_table). Using data from [India at Asian Games](https://en.wikipedia.org/wiki/India_at_the_Asian_Games) from Wikipedia.
+Here, you will look beyond the big numbers and shiny medals, and you'll discover the fascinating story of India's performance at the 2023 Asian Games. In this analysis, we'll show you that the sheer number of medals won doesn't tell the whole story because there are more medals available now. We'll explore how different sports have contributed to India's medal count over the years. What's truly exciting is the increase in the percentage of medals India has won compared to the total available, which means India is doing better in a variety of sports. So, it's not just about aiming for 100+ medals anymore; it's about understanding how India's success has evolved in detail.
 
 ```{r}
 #| label: Dont-eval-Harvesting-Asian-Games-Overall-Data
@@ -101,10 +104,9 @@ write_csv(medals_2022, "posts/india_asian_games/medals_2022.csv")
 write_csv(total_medals_hist, "posts/india_asian_games/total_medals_hist.csv")
 ```
 
-Reading in the data
-
 ```{r}
 #| label: reading-in-the-data-harvested
+#| echo: false
 
 ctry_tot_medals_hist <- read_csv("https://raw.githubusercontent.com/Aditya-Dahiya/FaNoOp/main/posts/india_asian_games/ctry_tot_medals_hist.csv")
 
@@ -115,6 +117,22 @@ total_medals_hist <- read_csv("https://raw.githubusercontent.com/Aditya-Dahiya/F
 ind_med_hist <- read_csv("https://raw.githubusercontent.com/Aditya-Dahiya/FaNoOp/main/posts/india_asian_games/ind_med_hist.csv")
 
 ind_tot_med_sport <- read_csv("https://raw.githubusercontent.com/Aditya-Dahiya/FaNoOp/main/posts/india_asian_games/ind_tot_med_sport.csv")
+
+total_medals_hist[19, "asiad"] <- 2023
+total_medals_hist <- total_medals_hist |>
+  select(-year) |>
+  rename(year = asiad)
+
+ind_med_hist[19, "year"] <- 2023
+
+df1 <- ind_med_hist |>
+  left_join(total_medals_hist,
+            by = join_by(year),
+            suffix = c("_ind", "_all")) |>
+  filter(year < 2024)
+
+lab_col = c("Hosted by India", "Hosted by other nations")
+names(lab_col) = c(TRUE, FALSE)
 ```
 
 ```{r}
@@ -152,8 +170,6 @@ rm(url2, html2, list2)
 write_csv(ind_med_hist, "posts/india_asian_games/ind_med_hist.csv")
 write_csv(ind_tot_med_sport, "posts/india_asian_games/ind_tot_med_sport.csv")
 ```
-
-Harvesting other countries and historical data from [here](https://bestsports.com.br/db/evnmedpag.php?evn=2336&lang=2), i.e., *bestsports.com*
 
 ```{r}
 #| label: one-tim-code-only-harvest-all-countries-historical-data-bestsports.com
@@ -258,109 +274,126 @@ medals_all_years <- read_csv("https://raw.githubusercontent.com/Aditya-Dahiya/Fa
   bind_rows(medals_2022 |> mutate(year = 2023))
 ```
 
-**Analysis**
-
-```{r}
-#| label: create-a-df1-for-india-ranks-etc.
-
-df1 <- ind_med_hist |>
-  left_join(total_medals_hist,
-            by = join_by(year),
-            suffix = c("_ind", "_all")) |>
-  filter(year < 2024)
-
-lab_col = c("Hosted by India", "Hosted by other nations")
-names(lab_col) = c(TRUE, FALSE)
-```
-
-```{r}
-#| label: fig-ranks-over-years
-#| fig-cap: "India's rank in Medal Tally at Asian Games over the years"
-
-df1 |>
-  mutate(hosted_india = (host_nations == "India")) |>
-  ggplot(aes(x = year, y = rank,
-             label = rank)) +
-  geom_point(aes(col = hosted_india,
-                 size = hosted_india)) +
-  geom_line(lty = 2) +
-  geom_text(hjust = 1, vjust = -1) +
-  theme_minimal() +
-  scale_y_reverse(breaks = seq(11, 1, by = -2),
-                  limits = c(11, 1)) +
-  scale_x_continuous(breaks = df1$year) +
-  # scale_size_discrete(labels = labeller(lab_col)) +
-  # scale_color_discrete(labels = labeller(lab_col)) +
-  labs(x = NULL, y = "Rank in Medals' Tally",
-       title = "India's rank fell over the decades",
-       subtitle = "But, 2023's performance is a marked improvement: Best ever since 1962!", col = NULL, size = NULL) +
-  theme(panel.grid = element_blank(),
-        legend.position = "bottom")
-```
-
-India's medal-haul has risen over the years
-
 ```{r}
 ind_med_hist |>
+  filter(year < 2023) |>
+  mutate(hosted = if_else(host_nations == "India",
+                          "Hosted by India",
+                          "Other Asian Games")) |>
   ggplot(aes(x = year,
              y = total,
              label = total,
-             fill = (host_nations == "India"))) +
+             fill = hosted)
+         ) +
   geom_bar(stat = "identity") +
-  scale_x_continuous(breaks = ind_med_hist$year)
+  geom_text(vjust = -1) +
+  scale_x_continuous(breaks = ind_med_hist$year[1:19]) +
+  theme_minimal() +
+  theme(panel.grid = element_blank(),
+        legend.position = "bottom",
+        axis.text.x = element_text(angle = 90),
+        axis.text.y = element_blank()) +
+  labs(x = NULL, y = NULL, fill = NULL,
+       title = "Total medals won by India in Asian Games over the years") +
+  scale_fill_manual(values = c("#676a6b", "#b5babd")) +
+  scale_y_continuous(limits = c(0, 115))
 ```
 
-But, so has the total number of medals up for grabs in each Asiad over the years: --
+While India's medal count has been on a steady rise for the past three decades, here's the plot twist: **the Asian Games have been dishing out more medals too**! So, the raw medal numbers don't reveal the full narrative.
 
 ```{r}
-total_medals_hist |>
-  ggplot() +
-  geom_bar(mapping = aes(x = year,
-                         y = total),
-           stat = "identity") +
-  scale_x_continuous(breaks = total_medals_hist$year)
+total_medals_hist |>  
+  ggplot(aes(x = year,
+             y = total,
+             label = total)) +
+  geom_bar(stat = "identity",
+           fill = "#b5babd") +
+  scale_x_continuous(breaks = total_medals_hist$year) +
+  geom_text(vjust = -1) +
+  theme_minimal() +
+  theme(panel.grid = element_blank(),
+        axis.text.x = element_text(angle = 90),
+        axis.text.y = element_blank()) +
+  labs(x = NULL, y = NULL, 
+       title = "Total medals awarded at Asian Games over the years") +
+  scale_y_continuous(limits = c(0, 1650))
 ```
 
-So, to make a meaningful comparison, lets see the percentage of total medals on offer won by India over the years
+Want to truly measure India's performance in the Asian Games? Let's dive into the numbers, and see the percentage of total medals bagged by India over the years.
 
 ```{r}
 df1 |>
   mutate(
-    hosted_india = (host_nations == "India"),
-    prop_medals = total_ind/total_all,
-    prop_gold = gold_ind/gold_all,
-    prop_silver = silver_ind/silver_all,
-    prop_bronze = bronze_ind/bronze_all
+    year = year,
+    medals = round(100*total_ind/total_all, 1),
+    hosted = if_else(host_nations == "India",
+                     "Hosted by India",
+                     "Other Asian Games"),
+    .keep = "none"
   ) |>
-  ggplot(aes(x = year)) +
-  geom_line(aes(y = prop_gold),
-            col = "gold",
-            lty = 2) +
-  geom_point(aes(y = prop_gold),
-             col = "gold") +
-  geom_line(aes(y = prop_silver),
-            col = "grey",
-            lty = 2) +
-  geom_point(aes(y = prop_silver),
-             col = "grey") +
-  geom_line(aes(y = prop_bronze),
-            col = "brown",
-            lty = 2) +
-  geom_point(aes(y = prop_bronze),
-             col = "brown") +
-  geom_line(aes(y = prop_medals),
-            col = "black",
-            lty = 2,
-            lwd = 1) +
-  geom_point(aes(y = prop_medals),
-             col = "black",
-             size = 3) +
+  ggplot(aes(x = year,
+             y = medals,
+             label = paste0(medals, " %"))) +
+  geom_point(aes(col = hosted),
+             size = 2) +
+  geom_line(lty = 2) +
+  ggrepel::geom_text_repel(aes(col = hosted)) +
   scale_x_continuous(breaks = df1$year) +
   theme_classic() +
-  scale_y_continuous(limits = c(0, 0.365))
+  theme(axis.text.x = element_text(angle = 90),
+        legend.position = "bottom",
+        axis.text.y = element_blank(),
+        axis.line.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        axis.line.x = element_blank()) +
+  labs(x = NULL, y = NULL, col = NULL, label = NULL,
+       title = "Percentage of Medals at Asiad won by India: Stagnated up-to 2018, rose in 2023",
+       subtitle = "Percentage of medals won is highest since 1966") +
+  scale_color_manual(values = c("#2280f2", "black"))
 ```
 
-Interactive Graph of proportion of medals won by all countries over years
+```{r}
+plotly::ggplotly(
+
+df1 |>
+  mutate(
+    year = year,
+    medals = round(100*total_ind/total_all, 1),
+    gold = round(100*gold_ind/gold_all, 1),
+    silver = round(100*silver_ind/silver_all, 1),
+    bronze = round(100*bronze_ind/bronze_all, 1),
+    .keep = "none"
+  ) |>
+  pivot_longer(
+    cols = -year,
+    names_to = "indicator",
+    values_to = "percentage"
+  ) |>
+  mutate(highlight = (indicator == "prop_medals")) |>
+  ggplot(aes(x = year,
+             y = percentage,
+             text = paste0(percentage, " %"),
+             group = indicator,
+             col = indicator,
+             lwd = highlight,
+             alpha = highlight)) +
+  geom_point(size = 2) +
+  geom_line(lty = 2) +
+  scale_x_continuous(breaks = df1$year) +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 90),
+        legend.position = "none") +
+  scale_linewidth_discrete(range = c(0.5, 1)) +
+  scale_color_manual(values = c("brown", "gold", "black", "grey")) +
+  scale_alpha_discrete(range = c(0.5, 1)) +
+  labs(x = NULL, y = "% of Medals won by India",
+       title = "The trend is the same for total medals, Gold, Silver and Bronze medals!"),
+
+tooltip = c("x", "group", "text")
+)
+```
+
+Now, explore this Interactive **Medal Share Graph for all Asian Countries** over the years -- Witness India's 2023 surge after years of Stagnation!
 
 ```{r}
 plotly::ggplotly(
@@ -410,7 +443,7 @@ tooltip = c("group", "text", "x")
 )
 ```
 
-A comparison chart for top 5 medal winning countries in Asian Games over the years: --
+In contrast, the traditionally strong medal-winning nations are either seeing a decline or getting stuck in a medal-sharing rut: --
 
 ```{r}
 com_countries = (ctry_tot_medals_hist |> pull(country))[1:5]
@@ -446,38 +479,40 @@ medals_all_years |>
   scale_linewidth_discrete(range = c(0.5, 1.2)) +
   theme_minimal() +
   theme(panel.grid = element_blank(),
-        legend.position = "none") +
+        legend.position = "none",
+        axis.text.x = element_text(angle = 90)) +
   labs(x = NULL, y = "Percentage of total medals won")
 ```
 
-**Pie chart for medals all over the years**
+### The share of different sports in India's all-time medals in Asian Games
 
-**Sports where India's all time medals have come from**
+::: panel-tabset
+## All Medals
 
 ```{=html}
 <iframe title="Share of sports in India's all-time medals at Asian Games" aria-label="Pie Chart" id="datawrapper-chart-qV2pZ" src="https://datawrapper.dwcdn.net/qV2pZ/1/" scrolling="no" frameborder="0" style="width: 0; min-width: 100% !important; border: none;" height="572" data-external="1"></iframe><script type="text/javascript">!function(){"use strict";window.addEventListener("message",(function(a){if(void 0!==a.data["datawrapper-height"]){var e=document.querySelectorAll("iframe");for(var t in a.data["datawrapper-height"])for(var r=0;r<e.length;r++)if(e[r].contentWindow===a.source){var i=a.data["datawrapper-height"][t]+"px";e[r].style.height=i}}}))}();
 </script>
 ```
-**Sports from where India's Gold, Silver and Bronze Medals have come from: --**
-
-Gold Medals
+## Gold
 
 ```{=html}
 <iframe title="Share in India's Gold Medals" aria-label="Pie Chart" id="datawrapper-chart-MauTe" src="https://datawrapper.dwcdn.net/MauTe/1/" scrolling="no" frameborder="0" style="width: 0; min-width: 100% !important; border: none;" height="500" data-external="1"></iframe><script type="text/javascript">!function(){"use strict";window.addEventListener("message",(function(a){if(void 0!==a.data["datawrapper-height"]){var e=document.querySelectorAll("iframe");for(var t in a.data["datawrapper-height"])for(var r=0;r<e.length;r++)if(e[r].contentWindow===a.source){var i=a.data["datawrapper-height"][t]+"px";e[r].style.height=i}}}))}();
 </script>
 ```
-Silver Medals
+## Silver
 
 ```{=html}
 <iframe title="Share in India's Silver Medals" aria-label="Pie Chart" id="datawrapper-chart-AkGs2" src="https://datawrapper.dwcdn.net/AkGs2/2/" scrolling="no" frameborder="0" style="width: 0; min-width: 100% !important; border: none;" height="500" data-external="1"></iframe><script type="text/javascript">!function(){"use strict";window.addEventListener("message",(function(a){if(void 0!==a.data["datawrapper-height"]){var e=document.querySelectorAll("iframe");for(var t in a.data["datawrapper-height"])for(var r=0;r<e.length;r++)if(e[r].contentWindow===a.source){var i=a.data["datawrapper-height"][t]+"px";e[r].style.height=i}}}))}();
 </script>
 ```
-Bronze Medals
+## Bronze
 
 ```{=html}
 <iframe title="Share in India's Bronze Medals" aria-label="Pie Chart" id="datawrapper-chart-Ve95F" src="https://datawrapper.dwcdn.net/Ve95F/1/" scrolling="no" frameborder="0" style="width: 0; min-width: 100% !important; border: none;" height="500" data-external="1"></iframe><script type="text/javascript">!function(){"use strict";window.addEventListener("message",(function(a){if(void 0!==a.data["datawrapper-height"]){var e=document.querySelectorAll("iframe");for(var t in a.data["datawrapper-height"])for(var r=0;r<e.length;r++)if(e[r].contentWindow===a.source){var i=a.data["datawrapper-height"][t]+"px";e[r].style.height=i}}}))}();
 </script>
 ```
+:::
+
 ```{r}
 #| label: harvest-sport-wise-medals-india-2023
 #| eval: false
@@ -497,40 +532,46 @@ list5[[3]] |>
   write_csv("posts/india_asian_games/temp4_dw.csv")
 ```
 
-**Sports from where India's Total, Gold, Silver and Bronze Medals have come from in 2023 Asian Games: --**
+#### Excitingly, in 2023, India's medal collection has reduced its reliance on athletics, spreading its glory across diverse sports, as depicted in the pie charts below!
 
-Total Medals
+::: panel-tabset
+## All Medals
 
 ```{=html}
 <iframe title="India's medals at 2023 Asian Games" aria-label="Pie Chart" id="datawrapper-chart-yRR2O" src="https://datawrapper.dwcdn.net/yRR2O/1/" scrolling="no" frameborder="0" style="width: 0; min-width: 100% !important; border: none;" height="572" data-external="1"></iframe><script type="text/javascript">!function(){"use strict";window.addEventListener("message",(function(a){if(void 0!==a.data["datawrapper-height"]){var e=document.querySelectorAll("iframe");for(var t in a.data["datawrapper-height"])for(var r=0;r<e.length;r++)if(e[r].contentWindow===a.source){var i=a.data["datawrapper-height"][t]+"px";e[r].style.height=i}}}))}();
 </script>
 ```
-Gold Medals
+## Gold
 
 ```{=html}
 <iframe title="India's Gold Medals at 2023 Asian Games" aria-label="Pie Chart" id="datawrapper-chart-bxxwr" src="https://datawrapper.dwcdn.net/bxxwr/1/" scrolling="no" frameborder="0" style="width: 0; min-width: 100% !important; border: none;" height="500" data-external="1"></iframe><script type="text/javascript">!function(){"use strict";window.addEventListener("message",(function(a){if(void 0!==a.data["datawrapper-height"]){var e=document.querySelectorAll("iframe");for(var t in a.data["datawrapper-height"])for(var r=0;r<e.length;r++)if(e[r].contentWindow===a.source){var i=a.data["datawrapper-height"][t]+"px";e[r].style.height=i}}}))}();
 </script>
 ```
-Silver Medals
+## Silver
 
 ```{=html}
 <iframe title="India's Silver Medals at 2023 Asian Games" aria-label="Pie Chart" id="datawrapper-chart-1zCie" src="https://datawrapper.dwcdn.net/1zCie/1/" scrolling="no" frameborder="0" style="width: 0; min-width: 100% !important; border: none;" height="500" data-external="1"></iframe><script type="text/javascript">!function(){"use strict";window.addEventListener("message",(function(a){if(void 0!==a.data["datawrapper-height"]){var e=document.querySelectorAll("iframe");for(var t in a.data["datawrapper-height"])for(var r=0;r<e.length;r++)if(e[r].contentWindow===a.source){var i=a.data["datawrapper-height"][t]+"px";e[r].style.height=i}}}))}();
 </script>
 ```
-Bronze Medals
+## Bronze
 
 ```{=html}
 <iframe title="India's Bronze Medals at 2023 Asian Games" aria-label="Pie Chart" id="datawrapper-chart-8KyJh" src="https://datawrapper.dwcdn.net/8KyJh/1/" scrolling="no" frameborder="0" style="width: 0; min-width: 100% !important; border: none;" height="500" data-external="1"></iframe><script type="text/javascript">!function(){"use strict";window.addEventListener("message",(function(a){if(void 0!==a.data["datawrapper-height"]){var e=document.querySelectorAll("iframe");for(var t in a.data["datawrapper-height"])for(var r=0;r<e.length;r++)if(e[r].contentWindow===a.source){var i=a.data["datawrapper-height"][t]+"px";e[r].style.height=i}}}))}();
 </script>
 ```
-Share of gold medals in India's medal over the years
+:::
+
+#### Also, the share of gold medals in India's medal haul hasn't changed much over the years, but, has improved slightly in 2023.
 
 ```{r}
 ind_med_hist |>
+  filter(year < 2024) |>
   mutate(
     share_gold = round(100*gold/total, 1),
     year = if_else(year == 2022, 2023, year),
-    hosted = (host_nations == "India")
+    hosted = if_else(host_nations == "India",
+                     "Hosted by India",
+                     "Other Asian Games")
   ) |>
   ggplot(aes(x = year,
              y = share_gold,
@@ -538,8 +579,45 @@ ind_med_hist |>
              )
          ) +
   ggrepel::geom_label_repel(aes(col = hosted)) +
-  geom_point(aes(col = hosted)) +
+  geom_point() +
   geom_line(lty = 2) +
   theme_minimal() +
-  scale_x_continuous(breaks = year)
+  scale_x_continuous(breaks = ind_med_hist$year) +
+  labs(y = "Percentage of Gold medals out of total medals won",
+       x = NULL,
+       col = NULL,
+       title = "The share of Gold medals hasn't changed much!") +
+  theme(panel.grid = element_blank(),
+        legend.position = "bottom") +
+  scale_color_manual(values = c("blue", "#545457"))
 ```
+
+#### Lastly, a look at India's rank in the Medal's Tally over the years: --
+
+```{r}
+#| label: fig-ranks-over-years
+#| fig-cap: "India's rank in Medal Tally at Asian Games over the years"
+
+df1 |>
+  mutate(hosted_india = if_else(host_nations == "India",
+                                "Hosted by India",
+                                "Other Asian Games")) |>
+  ggplot(aes(x = year, y = rank,
+             label = rank)) +
+  geom_point(aes(col = hosted_india),
+             size = 3) +
+  geom_line(lty = 2) +
+  geom_text(hjust = 1, vjust = -1) +
+  theme_minimal() +
+  scale_y_reverse(breaks = seq(11, 1, by = -2),
+                  limits = c(11, 1)) +
+  scale_x_continuous(breaks = df1$year) +
+  scale_color_manual(values = c("blue", "red")) +
+  labs(x = NULL, y = "Rank in Medals' Tally",
+       title = "India's rank stagnated over the past 3 decades",
+       subtitle = "But, 2023's performance is a marked improvement: Best ever since 1962!", col = NULL, size = NULL) +
+  theme(panel.grid = element_blank(),
+        legend.position = "bottom")
+```
+
+***Credits:** I have used data on Asian Games historically from this Wikipedia [article](https://en.wikipedia.org/wiki/All-time_Asian_Games_medal_table), and the [India at Asian Games](https://en.wikipedia.org/wiki/India_at_the_Asian_Games) article. Apart from this, I have relied upon statistics from [bestsports.com](https://bestsports.com.br/db/evnmedpag.php?evn=2336&lang=2) and [R](https://www.r-project.org/about.html) programming language, [tidyverse](https://www.tidyverse.org/) and [rvest](https://rvest.tidyverse.org/).*
