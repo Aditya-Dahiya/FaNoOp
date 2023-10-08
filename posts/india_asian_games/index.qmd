@@ -1,0 +1,334 @@
+---
+title: "India at Asian Games - Over the Years"
+subtitle: "Analyzing medals data on how India has performed over the years"
+author: "Aditya Dahiya"
+date: "2023-10-06"
+categories: [analysis]
+image: "logo.png"
+editor_options: 
+  chunk_output_type: console
+execute: 
+  echo: false
+  error: false
+  message: false
+  warning: false
+filters:
+  - social-share
+share:
+  permalink: "https://aditya-dahiya.github.io/FaNoOp/posts/india_asian_games/"
+  description: "India at Asian Games - medals - over the years"
+  twitter: true
+  facebook: true
+  linkedin: true
+  email: true
+---
+
+```{r}
+#| label: setup
+
+library(tidyverse)
+library(rvest)
+library(gt)
+library(gtExtras)
+library(janitor)
+```
+
+Retrieve data on Asian Games - total medals in each Asiad edition and total medals by all countries historically from a Wikipedia [article](https://en.wikipedia.org/wiki/All-time_Asian_Games_medal_table).
+
+```{r}
+#| label: Harvesting-Asian-Games-Overall-Data
+
+# Capture url, html and rvest 
+url1 <- "https://en.wikipedia.org/wiki/All-time_Asian_Games_medal_table"
+html1 <- read_html(url1)
+
+list1 <- html1 |>
+  html_nodes("table") |>
+  html_table()
+
+# Total number of medals, gold, silver and bronze in each edition of Asiad
+total_medals_hist = list1[[1]] |>
+  filter(Number != "Total") |>
+  mutate_at(vars(-Number), parse_number) |>
+  clean_names() |>
+  rename(asiad = number)
+
+# Correct the year for 2022 Asiad to 2023
+total_medals_hist[19, "year"] <- 2023
+
+# Total cumulative medals by every country from start upto 2018 Asiad
+ctry_tot_medals_hist <- list1[[2]] |>
+  mutate(
+    country = str_extract(Nation, "\\w+"),
+    code = str_extract(Nation, "\\(([^)]*)\\)"),
+    code = str_sub(code, 2, nchar(code) - 1)
+  ) |>
+  select(-Nation) |>
+  relocate(country, .before = Gold) |>
+  clean_names() |>
+  filter(!str_detect(rank, "Total")) |>
+  mutate(rank = as.numeric(rank))
+
+# 2022 Asian Games Medal Table
+url3 <- "https://en.wikipedia.org/wiki/2022_Asian_Games_medal_table"
+html3 <- read_html(url3)
+list3 <- html3 |>
+  html_nodes("table") |>
+  html_table()
+
+medals_2022 <- list3[[2]] |>
+  clean_names() |>
+  filter(!str_detect(rank, "Total")) |>
+  mutate(
+    rank = as.numeric(rank),
+    nation = str_replace_all(nation, "[*+/]", "")
+  )
+
+total_medals_hist[19, "gold"] <- medals_2022 |> pull(gold) |> sum()
+total_medals_hist[19, "silver"] <- medals_2022 |> pull(silver) |> sum()
+total_medals_hist[19, "bronze"] <- medals_2022 |> pull(bronze) |> sum()
+total_medals_hist[19, "total"] <- medals_2022 |> pull(total) |> sum()
+
+rm(list1, list3, html1, html3, url1, url3)
+```
+
+Using data from [India at Asian Games](https://en.wikipedia.org/wiki/India_at_the_Asian_Games) from Wikipedia: --
+
+```{r}
+#| label: Harvesting-India-Data-at-Asian-Games
+
+
+url2 <- "https://en.wikipedia.org/wiki/India_at_the_Asian_Games"
+html2 <- read_html(url2)
+
+list2 <- html2 |>
+  html_nodes("table") |>
+  html_table()
+
+ind_med_hist <- list2[[2]] |>
+  clean_names() |>
+  separate_wider_delim(cols = games,
+                       delim = " ",
+                       too_many = "merge",
+                       too_few = "align_end",
+                       names = c("year", "host_city")) |>
+  filter(host_city != "Total") |>
+  mutate(across(c(year, rank, gold, silver, bronze, total),
+                parse_number),
+         host_city = str_replace_all(host_city, "\\[.*?\\]", "")) |>
+  print(n = Inf)
+
+ind_tot_med_sport <- list2[[3]] |>
+  clean_names() |>
+  select(-rank) |>
+  filter(sport != "Total")
+
+rm(url2, html2, list2)
+```
+
+Harvesting other countries and historical data from [here](https://bestsports.com.br/db/evnmedpag.php?evn=2336&lang=2), i.e., bestsports.com
+
+```{r}
+#| label: one-tim-code-only: harvest-all-countries-historical-data-bestsports.com
+#| eval: false
+
+url4 <- "https://bestsports.com.br/db/evnmedpag.php?evn=2336&lang=2"
+html4 <- read_html(url4)
+list4 <- html4 |>
+  html_nodes("table") |>
+  html_table()
+
+medals_2018 <- list4[[2]] |>
+  clean_names() |>
+  filter(!is.na(gold)) |>
+  select(-country_2) |>
+  rename(rank = country,
+         nation = country_3) |>
+  mutate(year = 2018) |>
+  relocate(year, .before = rank)
+
+read_medals <- function(website, year_games){
+  html_temp <- read_html(website)
+
+  list_temp <- html_temp |>
+  html_nodes("table") |>
+  html_table()
+
+  return(
+    list_temp[[2]] |>
+    clean_names() |>
+    filter(!is.na(gold)) |>
+    select(-country_2) |>
+    rename(rank = country,
+           nation = country_3) |>
+    mutate(year = year_games) |>
+    relocate(year, .before = rank)
+  ) 
+}
+
+medals_2014 <- read_medals("https://bestsports.com.br/db/evnmedpag.php?evn=2002&lang=2", 2014)
+
+medals_2010 <- read_medals("https://bestsports.com.br/db/evnmedpag.php?evn=858&lang=2", 2010)
+
+medals_2006 <- read_medals("https://bestsports.com.br/db/evnmedpag.php?evn=508&lang=2", 2006)
+
+medals_2002 <- read_medals("https://bestsports.com.br/db/evnmedpag.php?evn=615&lang=2", 2002)
+
+medals_1998 <- read_medals("https://bestsports.com.br/db/evnmedpag.php?evn=857&lang=2", 1998)
+
+medals_1994 <- read_medals("https://bestsports.com.br/db/evnmedpag.php?evn=859&lang=2", 1994)
+
+medals_1990 <- read_medals("https://bestsports.com.br/db/evnmedpag.php?evn=860&lang=2", 1990)
+
+medals_1986 <- read_medals("https://bestsports.com.br/db/evnmedpag.php?evn=861&lang=2", 1986)
+
+medals_1982 <- read_medals("https://bestsports.com.br/db/evnmedpag.php?evn=862&lang=2", 1982)
+
+medals_1978 <- read_medals("https://bestsports.com.br/db/evnmedpag.php?evn=863&lang=2", 1978)
+
+medals_1974 <- read_medals("https://bestsports.com.br/db/evnmedpag.php?evn=864&lang=2", 1974)
+
+medals_1970 <- read_medals("https://bestsports.com.br/db/evnmedpag.php?evn=865&lang=2", 1970)
+
+medals_1966 <- read_medals("https://bestsports.com.br/db/evnmedpag.php?evn=866&lang=2", 1966)
+  
+medals_1962 <- read_medals("https://bestsports.com.br/db/evnmedpag.php?evn=867&lang=2", 1962) |>
+  mutate(rank = replace_na(rank, 13))
+
+medals_1958 <- read_medals("https://bestsports.com.br/db/evnmedpag.php?evn=868&lang=2", 1958)
+
+medals_1954 <- read_medals("https://bestsports.com.br/db/evnmedpag.php?evn=869&lang=2", 1954)
+
+medals_1951 <- read_medals("https://bestsports.com.br/db/evnpag.php?evn=870&lang=2", 1951)
+
+medals_all_years <- bind_rows(medals_1951,
+          medals_1954,
+          medals_1958,
+          medals_1962,
+          medals_1966,
+          medals_1970,
+          medals_1974,
+          medals_1978,
+          medals_1982,
+          medals_1986,
+          medals_1990,
+          medals_1994,
+          medals_1998,
+          medals_2002,
+          medals_2006,
+          medals_2010,
+          medals_2014,
+          medals_2018)
+write_csv(medals_all_years, "posts/india_asian_games/medals_all_years.csv")
+```
+
+```{r}
+#| label: read-all-countries-medals-all-years
+
+medals_all_years <- read_csv("posts/india_asian_games/medals_all_years.csv")
+
+```
+
+**Analysis**
+
+```{r}
+#| label: fig-ranks-over-years
+#| fig-cap: "India's rank in Medal Tally at Asian Games over the years"
+
+df1 <- ind_med_hist |>
+  left_join(total_medals_hist,
+            by = join_by(year),
+            suffix = c("_ind", "_all")) |>
+  filter(year < 2024)
+
+lab_col = c("Hosted by India", "Hosted by other nations")
+names(lab_col) = c(TRUE, FALSE)
+
+df1 |>
+  mutate(hosted_india = (host_nations == "India")) |>
+  ggplot(aes(x = year, y = rank,
+             label = rank)) +
+  geom_point(aes(col = hosted_india,
+                 size = hosted_india)) +
+  geom_line(lty = 2) +
+  geom_text(hjust = 1, vjust = -1) +
+  theme_minimal() +
+  scale_y_reverse(breaks = seq(11, 1, by = -2),
+                  limits = c(11, 1)) +
+  scale_x_continuous(breaks = df1$year) +
+  # scale_size_discrete(labels = labeller(lab_col)) +
+  # scale_color_discrete(labels = labeller(lab_col)) +
+  labs(x = NULL, y = "Rank in Medals' Tally",
+       title = "India's rank has fell over the decades",
+       subtitle = "But, 2023's performance is a marked improvement: Best ever since 1962!", col = NULL, size = NULL) +
+  theme(panel.grid = element_blank(),
+        legend.position = "bottom")
+```
+
+India's medal-haul has risen over the years
+
+```{r}
+ind_med_hist |>
+  ggplot(aes(x = year,
+             y = total,
+             label = total,
+             fill = (host_nations == "India"))) +
+  geom_bar(stat = "identity") +
+  scale_x_continuous(breaks = ind_med_hist$year)
+```
+
+But, so has the total number of medals up for grabs in each Asiad over the years: --
+
+```{r}
+total_medals_hist |>
+  ggplot() +
+  geom_bar(mapping = aes(x = year,
+                         y = total),
+           stat = "identity") +
+  scale_x_continuous(breaks = total_medals_hist$year)
+```
+
+So, to make a meaningful comparison, lets see the percentage of total medals on offer won by India over the years
+
+```{r}
+df1 |>
+  mutate(
+    hosted_india = (host_nations == "India"),
+    prop_medals = total_ind/total_all,
+    prop_gold = gold_ind/gold_all,
+    prop_silver = silver_ind/silver_all,
+    prop_bronze = bronze_ind/bronze_all
+  ) |>
+  ggplot(aes(x = year)) +
+  geom_line(aes(y = prop_gold),
+            col = "gold",
+            lty = 2) +
+  geom_point(aes(y = prop_gold),
+             col = "gold") +
+  geom_line(aes(y = prop_silver),
+            col = "grey",
+            lty = 2) +
+  geom_point(aes(y = prop_silver),
+             col = "grey") +
+  geom_line(aes(y = prop_bronze),
+            col = "brown",
+            lty = 2) +
+  geom_point(aes(y = prop_bronze),
+             col = "brown") +
+  geom_line(aes(y = prop_medals),
+            col = "black",
+            lty = 2,
+            lwd = 1) +
+  geom_point(aes(y = prop_medals),
+             col = "black",
+             size = 3) +
+  scale_x_continuous(breaks = df1$year) +
+  theme_classic() +
+  scale_y_continuous(limits = c(0, 0.365))
+```
+
+A comparison chart for (1) China, (2) Pakistan (3) Sri Lanka (4) Indonesia (5) Uzbekistan (6) Iran
+
+```{r}
+
+```

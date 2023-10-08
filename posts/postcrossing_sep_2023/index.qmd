@@ -858,6 +858,6 @@ df_reg |>
 
 3.  Being elderly or young has no correlation with the number of postcards sent. Instead, it is wealth (GDP per capita) that correlates with the number of postcards sent on average by a member, in a country.
 
-### Happy postcrossing on the World Postcards Day - October 1! 
+### Happy postcrossing on the World Postcards Day - October 1!
 
-![](Postcrossing Main Logo.png){width="427"}
+![](Postcrossing%20Main%20Logo.png){width="427"}
