@@ -1,7 +1,7 @@
 ---
-title: "AIIMS in India"
+title: "AIIMS Unveiled: A Visual Symphony of Numbers"
 author: "Aditya Dahiya"
-subtitle: "A look at AIIMS over the years"
+subtitle: "Unveiling the canvas of progress, our graphical odyssey unveils the quantum of faculty, students, and funding across India's new upcoming AIIMS establishments. Amidst the evolving landscape, AIIMS New Delhi still stands as a benchmark of distinction, casting a guiding light for its peers as they carve their unique paths towards academic brilliance and healthcare innovation."
 date: "2023-12-10"
 categories: 
  - "analysis"
@@ -16,15 +16,17 @@ filters:
   - lightbox
 lightbox: auto
 share:
-  permalink: "https://aditya-dahiya.github.io/FaNoOp/posts/aiims_india/"
-  description: "AIIMS in India"
+  permalink: "https://aditya-dahiya.github.io/FaNoOp/posts/aiims_india/index.html"
+  description: "AIIMS Unveiled: A Visual Symphony of Numbers"
   twitter: true
   facebook: true
   linkedin: true
   email: true
 ---
 
-Source of the Data: [Rajya Sabha](https://sansad.in/rs) Unstarred Question 273. Posted [here](https://sansad.in/rs/questions/questions-and-answers). Answer.
+Here, we look at some intersting statistics provided in reply to a question in [Rajya Sabha](https://sansad.in/rs) (India's Council of States, Upper House of the Parliament) Question 273, of the ongoing (December 2023) session. The question, and its answer, compares the 23 different All India Institute(s) of Medical Sciences (AIIMS), that have come up across India, and their comparison with the original AIIMS (New Delhi). The original question can be viewed [here](https://sansad.in/rs/questions/questions-and-answers). The complete answer (in PDF) can be seen [here](https://github.com/Aditya-Dahiya/FaNoOp/blob/main/posts/aiims_india/aiims_data.pdf).
+
+*\[Note: All of the statistics come from official Rajya Sabha [Website](https://sansad.in/rs)\]*
 
 ```{r}
 #| label: setup
@@ -34,7 +36,6 @@ library(here)
 library(patchwork)
 library(sf)
 library(ggiraph)             # Animations
-library(gdtools)            # Fonts for ggiraph
 
 # Reading in the Data
 df <- read_csv(here("posts", "aiims_india", "aiims_data.csv"))
@@ -51,7 +52,7 @@ fill_scale = c(
 #| fig-width: 10
 #| fig-height: 10
 #| fig-cap: "Interactive Map of India, with locations of various AIIMS Institutes" 
-#| label: fig-1
+#| label: fig-map
 
 # Data for locations, setting the CRS
 dfplot2 <- df |> 
@@ -123,7 +124,8 @@ g2 <- ggplot(data = map) +
     legend.direction = "horizontal",
     legend.box = "vertical",
     plot.subtitle = element_text(size = 15),
-    legend.title = element_text(size = 10)
+    legend.title = element_text(size = 12),
+    plot.title = element_text(size = 27)
   ) +
   guides(
     size = guide_legend(label.theme = element_text(size = 15)),
@@ -296,7 +298,7 @@ g <- dfplot1 |>
                  size = size_text),
              hjust = 1.05) +
   
-  scale_x_continuous(limits = c(-500, 2000),
+  scale_x_continuous(limits = c(-600, 2000),
                      breaks = seq(0, 2000, 500)) + 
   scale_size_continuous(range = c(4, 5)) +
   scale_fill_manual(values = legend_barplot) +
@@ -349,7 +351,7 @@ g +
 #| fig-align: "center"
 #| fig-width: 8
 #| label: fig-opd-ipd
-#| fig-cap: "Comparing OPD and IPd (Admissions) numbers within each AIIMS"
+#| fig-cap: "Comparing OPD and IPD (Admissions) numbers within each AIIMS"
 
 df |> 
   group_by(location) |> 
@@ -487,15 +489,17 @@ g2 <- dfplot3 |>
 g1 + g2 +
   plot_annotation(
     title = "AIIMS Jammu & Rajkot have highest infrastructure spending (per MBBS seat)",
-    subtitle = "However, one must factor in for inflation. Most of AIIMS New Delhi funds were spent 30-40 years ago. Hence, the figures reflect partial-truth.\nAlso, sanctioned funds (right-side panel) are mere plans, awaiting implementation. The actual expenditure is a better indicator of current infrastructure."
+    subtitle = "However, one must factor in for inflation. Most of AIIMS New Delhi funds were spent years ago. Hence, the figures reflect partial-truth.\nAlso, sanctioned funds (right-side panel) are mere plans, awaiting implementation. The actual expenditure is a better indicator."
   ) &
   theme(plot.title = element_text(size = 18,
                                   face = "bold"),
-        plot.subtitle = element_text(size = 9),
-        axis.text = element_text(size = 6)) 
+        plot.subtitle = element_text(size = 12),
+        axis.text = element_text(size = 12)) 
 ```
 
-### The Complete Data (from [Rajya Sabha](https://sansad.in/rs/questions/questions-and-answers) reply)
+------------------------------------------------------------------------
+
+### The Complete Data (from [Rajya Sabha](https://sansad.in/rs/questions/questions-and-answers) [reply](https://github.com/Aditya-Dahiya/FaNoOp/blob/main/posts/aiims_india/aiims_data.pdf))
 
 ```{r}
 library(gt)
