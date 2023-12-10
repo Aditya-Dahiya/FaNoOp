@@ -1,0 +1,528 @@
+---
+title: "AIIMS in India"
+author: "Aditya Dahiya"
+subtitle: "A look at AIIMS over the years"
+date: "2023-12-10"
+categories: 
+ - "analysis"
+ - "Government"
+execute: 
+  echo: false
+  error: false
+  message: false
+  warning: false
+filters:
+  - social-share
+  - lightbox
+lightbox: auto
+share:
+  permalink: "https://aditya-dahiya.github.io/FaNoOp/posts/aiims_india/"
+  description: "AIIMS in India"
+  twitter: true
+  facebook: true
+  linkedin: true
+  email: true
+---
+
+Source of the Data: [Rajya Sabha](https://sansad.in/rs) Unstarred Question 273. Posted [here](https://sansad.in/rs/questions/questions-and-answers). Answer.
+
+```{r}
+#| label: setup
+
+library(tidyverse)
+library(here)
+library(patchwork)
+library(sf)
+library(ggiraph)             # Animations
+library(gdtools)            # Fonts for ggiraph
+
+# Reading in the Data
+df <- read_csv(here("posts", "aiims_india", "aiims_data.csv"))
+
+# A common colour scale
+fill_scale = c(
+  "TRUE" = "orange",
+  "FALSE" = "grey"
+)
+
+```
+
+```{r}
+#| fig-width: 10
+#| fig-height: 10
+#| fig-cap: "Interactive Map of India, with locations of various AIIMS Institutes" 
+#| label: fig-1
+
+# Data for locations, setting the CRS
+dfplot2 <- df |> 
+  mutate(
+    map_label = paste0(
+      "AIIMS ", location, 
+      "\nState: ", state,
+      "\nYear Sanctioned: ", year_sanction,
+      "\nMBBS Seats (per year): ", mbbs_sanctioned,
+      "\nFaculty in place: ", faculty_position,
+      "\nOPD Visits (since May 2019): ", 
+      round(opd_patients_2019_on/1000, 0), " K",
+      "\nIPD Admissions (since May 2019): ", 
+      round(ipd_patients_2019_on/1000, 0), " K"
+    )
+  ) |> 
+  # Fix minor name spelling incompatibility
+  mutate(state = if_else(state == "Chhattisgarh",
+                         "Chhattishgarh",
+                         state)) |> 
+  st_as_sf(coords = c("longitude", "latitude"),
+           crs = "WGS84")
+
+# Getting India Map
+map <- read_sf(here(
+  "posts", "aiims_india", "india_map",
+  "India_State_Boundary.shp"
+)) |> 
+  # An indicator for states with and without AIIMS
+  mutate(state_fill = State_Name %in% dfplot2$state)
+
+# Actual Plot
+g2 <- ggplot(data = map) +
+  
+  # Map of India
+  geom_sf(
+    mapping = aes(fill = state_fill),
+    colour = "#303030"
+  ) +
+  
+  # Location of AIIMS
+  geom_sf_interactive(
+    data = dfplot2,
+    mapping = aes(
+      size = opd_patients_2019_on,
+      tooltip = map_label,
+      data_id = location
+    ),
+    alpha = 0.9,
+    color = "#424242"
+  ) +
+  
+  # Labels
+  labs(size = "OPD Patient visits\n(since May 2019)\n(in millions)",
+       title = "All India Institute(s) of Medical Sciences",
+       subtitle = "Hover / Touch the location to view OPD, IPD, Faculty and Student numbers") +
+  
+  # Size, Fill Scales
+  scale_size(range = c(2, 8),
+                  labels = scales::label_number_si()) +
+  scale_fill_manual(
+    values = c("#c3cce8", "#dee6fc"),
+    labels = c("State/UT without AIIMS", "State with AIIMS"),
+    name = NULL
+  ) +
+  theme_void(base_family = "sans") +
+  theme(
+    legend.position = "bottom",
+    legend.direction = "horizontal",
+    legend.box = "vertical",
+    plot.subtitle = element_text(size = 15),
+    legend.title = element_text(size = 10)
+  ) +
+  guides(
+    size = guide_legend(label.theme = element_text(size = 15)),
+    fill = guide_legend(label.theme = element_text(size = 12))
+  )
+
+girafe(ggobj = g2,
+       options = list(
+         opts_hover(css = "fill:orange;stroke:brown;stroke-width:1px;"))
+  )
+```
+
+------------------------------------------------------------------------
+
+```{r}
+#| fig-asp: 1
+#| fig-width: 10
+#| label: fig-2
+#| fig-cap: "Exploring Faculty and student numbers in different AIIMS (as of Dec 2023)"
+
+g1 <- df |> 
+  rename(indicator = faculty_position) |> 
+  filter(indicator > 0) |> 
+  ggplot(aes(x = indicator,
+             y = reorder(location, indicator),
+             fill = location == "New Delhi")) +
+  geom_col() +
+  scale_x_continuous(expand = expansion(mult = c(0, 0.05)),
+                     labels = scales::label_number_si()) +
+  labs(subtitle = "Faculty positions filled: AIIMS New Delhi is far ahead",
+       x = "Number of Faculty") +
+  guides(fill = "none") +
+  scale_fill_manual(values = fill_scale) +
+  cowplot::theme_minimal_vgrid() +
+  theme(
+    legend.position = "none",
+    panel.grid = element_line(linetype = 2),
+    axis.title.y = element_blank(),
+    axis.ticks.y = element_blank(),
+    axis.line.y = element_blank(),
+    plot.title.position = "plot"
+  )
+
+g2 <- df |> 
+  rename(indicator = mbbs_total) |> 
+  filter(indicator > 0) |> 
+  ggplot(aes(x = indicator,
+             y = reorder(location, indicator),
+             fill = location == "New Delhi")) +
+  geom_col() +
+  scale_x_continuous(expand = expansion(mult = c(0, 0.05)),
+                     labels = scales::label_number_si()) +
+  labs(subtitle = "MBBS Students - AIIMS New Delhi leads, but closely followed by others.",
+       x = "MBBS students (currently)") +
+  guides(fill = "none") +
+  scale_fill_manual(values = fill_scale) +
+  cowplot::theme_minimal_vgrid() +
+  theme(
+    legend.position = "none",
+    panel.grid = element_line(linetype = 2),
+    axis.title.y = element_blank(),
+    axis.ticks.y = element_blank(),
+    axis.line.y = element_blank(),
+    plot.title.position = "plot"
+  )
+
+g3 <- df |> 
+  mutate(ratio = faculty_position/mbbs_total) |> 
+  filter(faculty_position > 0) |> 
+  ggplot(
+    mapping = aes(y = reorder(location, ratio),
+                  x = ratio,
+                  fill = location == "New Delhi")
+  ) +
+  geom_col() +
+  guides(fill = "none") +
+  labs(subtitle = "Combining the numbers, AIIMS New Delhi has Faculty-Student Ratio almost three times higher than the 2nd best AIIMS",
+       caption = "Note 1: The metric uses actual faculty in place, instead of the sanctioned strength.\nNote 2: Number of students are the total MBBS students in the Insitute across different MBBS Profs/years",
+       x = "Number of faculty present (per MBBS student currently studying)") +
+  scale_fill_manual(values = fill_scale) +
+  scale_x_continuous(expand = expansion(mult = c(0, 0.05))) +
+  cowplot::theme_minimal_vgrid() +
+  theme(
+    legend.position = "none",
+    panel.grid = element_line(linetype = 2),
+    axis.title.y = element_blank(),
+    axis.ticks.y = element_blank(),
+    axis.line.y = element_blank(),
+    plot.title.position = "plot"
+  )
+
+(g1 + g2) / g3 +
+  plot_annotation(
+    title = "AIIMS New Delhi is way ahead in Faculty-Student Ratio"
+  ) &
+  theme(plot.caption = element_text(face = "italic",
+                                    hjust = 0),
+        plot.caption.position = "plot",
+        plot.title = element_text(hjust = 0,
+                                  size = 21,
+                                  face = "bold"),
+        plot.subtitle = element_text(size = 12),
+        plot.margin = margin(10, 0, 10, 0, 
+                             unit = "pt"))
+  
+```
+
+------------------------------------------------------------------------
+
+```{r}
+#| fig-asp: 1.5
+#| fig-width: 10
+#| label: fig-faculty-vacancy
+#| fig-cap: "Percentage Faculty positions filled and vacant across different AIIMS"
+
+legend_barplot = c(
+  "Total Faculty positions" = "lightgrey",
+  "Percentage Faculty Positions Filled" = "darkgrey"
+)
+
+dfplot1 <- df |> 
+  mutate(state = case_when(
+    state == "Uttar Pradesh" ~ "UP",
+    state == "Jammu and Kashmir" ~ "J&K",
+    .default = state
+  )) |> 
+  filter(faculty_sanctioned > 0) |> 
+  # Create tibble with total and filled seats by year
+  select(year_sanction,
+         location, state,
+         faculty_position,
+         faculty_sanctioned) |> 
+  mutate(location = paste0(location, " (", state, ")")) |> 
+  group_by(year_sanction) |> 
+  summarise(
+    names = paste(location, collapse = "\n"),
+    tot_pos = sum(faculty_position),
+    tot_san = sum(faculty_sanctioned)
+  ) |> 
+  mutate(
+    perc_fac = round(100 * tot_pos / tot_san, 1),
+    size_text = if_else(year_sanction %in% c(2012, 2015, 2018),
+                        4, 
+                        6)
+  ) |> 
+  drop_na() 
+  
+# Plotting
+g <- dfplot1 |>   
+  ggplot(aes(y = as.character(year_sanction),
+             width = 0.9)) +
+  
+  
+  # Total Seats
+  geom_col(aes(x = tot_san,
+           fill = "Total Faculty positions")) +
+  geom_label(aes(x = tot_san,
+                label = tot_san),
+            hjust = -0.5,
+            fontface = "bold") +
+  
+  # Filled Seats
+  geom_col(aes(x = tot_pos,
+           fill = "Percentage Faculty Positions Filled")) +
+  geom_text(aes(x = tot_pos,
+                label = paste0(perc_fac, "%")),
+            hjust = 0) +
+  geom_text(aes(x = 0, 
+                 label = names,
+                 size = size_text),
+             hjust = 1.05) +
+  
+  scale_x_continuous(limits = c(-500, 2000),
+                     breaks = seq(0, 2000, 500)) + 
+  scale_size_continuous(range = c(4, 5)) +
+  scale_fill_manual(values = legend_barplot) +
+  
+  labs(title = "Vacancy of Faculty posts is similar in newer and older AIIMSs",
+       y = "Year Established",
+       x = "Faculty Strength", 
+       fill = NULL) +
+  cowplot::theme_minimal_vgrid() +
+  theme(
+    axis.line.y = element_line(arrow = arrow(),
+                               linetype = 2),
+    legend.position = "bottom",
+    plot.title.position = "plot",
+    plot.title = element_text(size = 21)
+  ) +
+  guides(
+    size = "none"
+  )
+
+g1 <- dfplot1 |> 
+  ggplot(
+    mapping = aes(y = as.character(year_sanction),
+                  x = perc_fac,
+                  fill = "Percentage Faculty Positions Filled")
+  ) + 
+  labs(x = "Faculty positions filled (%)",
+       y = "Year Established") + 
+  geom_col() +
+  scale_fill_manual(values = legend_barplot) +
+  ggthemes::theme_clean() +
+  theme(
+    axis.line.y = element_blank(),
+    axis.line.x = element_blank(),
+    axis.text = element_text(face = "bold"),
+    legend.position = "none",
+    axis.title.y = element_text(size = 10),
+    plot.background = element_rect(fill = "#f5f5f5")
+  ) 
+
+g + 
+  inset_element(g1,
+                left = 0.6, bottom = 0.6, right = 1, top = 1)
+```
+
+------------------------------------------------------------------------
+
+```{r}
+#| fig-asp: 1
+#| fig-align: "center"
+#| fig-width: 8
+#| label: fig-opd-ipd
+#| fig-cap: "Comparing OPD and IPd (Admissions) numbers within each AIIMS"
+
+df |> 
+  group_by(location) |> 
+  mutate(ratio = ipd_patients_2019_on*100/opd_patients_2019_on) |>
+  filter(opd_patients_2019_on > 0 & ipd_patients_2019_on > 0 ) |> 
+  select(location, ipd_patients_2019_on, opd_patients_2019_on, ratio) |> 
+  mutate(
+    ipd = paste0(round(ipd_patients_2019_on/1000, 0), "K"),
+    opd = paste0(round(opd_patients_2019_on/1000, 0), "K"),
+    bar_label = paste0("OPD:", opd, "\nIPD:", ipd)
+  ) |> 
+
+  ggplot(
+    mapping = aes(y = reorder(location, ratio),
+                  x = ratio,
+                  fill = location == "New Delhi")
+  ) +
+  geom_col() +
+  geom_text(aes(label = bar_label),
+            hjust = 0,
+            size = 2.5) +
+  labs(title = "Ratio of OPD Patients to IPD Admissions (since May 2019)",
+       subtitle = "A Higher Ratio indicates fewer admissions done in that Insitute, as compared to OPD numbers",
+       x = "Number of OPD Patients for each 1 admission (IPD), on average") +
+  scale_x_continuous(expand = c(0, 0),
+                     limits = c(0, 12)) +
+  scale_fill_manual(values = fill_scale) +
+  cowplot::theme_minimal_vgrid() +
+  theme(
+    legend.position = "none",
+    panel.grid = element_line(linetype = 2),
+    axis.title.y = element_blank(),
+    axis.ticks.y = element_blank(),
+    axis.line.y = element_blank(), 
+    plot.title.position = "plot",
+    plot.title = element_text(size = 18)
+  )
+```
+
+------------------------------------------------------------------------
+
+```{r}
+#| fig-asp: 1
+#| fig-width: 10
+#| label: fig-opd-faculty
+#| fig-cap: "Ratio of OPD patients per month to the existing faculty at each AIIMS"
+
+df |> 
+  select(-c(latitude, longitude, state)) |> 
+  mutate(ratio = opd_patients_2019_on/(faculty_position * 55)) |> 
+  filter(faculty_position > 0 & opd_patients_2019_on > 0) |> 
+  ggplot(
+    mapping = aes(y = reorder(location, ratio),
+                  x = ratio,
+                  fill = location == "New Delhi")
+  ) +
+  geom_col() +
+  geom_text(aes(x = 0, 
+                label = paste0(round(opd_patients_2019_on/1000, 0), 
+                               " K")),
+            hjust = -0.1,
+            size = 3,
+            fontface = "italic") +
+  scale_x_continuous(expand = expansion(mult = c(0, 0.05)),
+                     labels = scales::label_number_si()) +
+  labs(x = "Number of OPD patients (per month) per working faculty (on average)",
+       title = "Newer AIIMS have much higher OPD load on the working faculty",
+       subtitle = "Number of patients seen, per month, between May 2019 and December 2023, by each working faculty on average\nThe numbers (in italics) in left end of bars represent total OPD (in thousands) for the Institute since May 2019") +
+  guides(fill = "none") +
+  scale_fill_manual(values = fill_scale) +
+  cowplot::theme_minimal_vgrid() +
+  theme(
+    legend.position = "none",
+    panel.grid = element_line(linetype = 2),
+    axis.title.y = element_blank(),
+    axis.ticks.y = element_blank(),
+    axis.line.y = element_blank(),
+    plot.title.position = "plot",
+    plot.title = element_text(size = 18)
+  )
+```
+
+------------------------------------------------------------------------
+
+```{r}
+#| fig-asp: 0.7
+#| fig-width: 10
+#| fig-cap: "Spending, per MBBS seat: Sanctioned and Actual, for different AIIMS"
+#| label: fig-spending-per-seat
+
+
+dfplot3 <- df |> 
+  filter(mbbs_sanctioned > 0) |> 
+  mutate(ratio_rel = funds_released/mbbs_sanctioned,
+         ratio_san = project_cost_approved/mbbs_sanctioned)
+  
+g1 <- dfplot3 |> 
+  ggplot(aes(y = reorder(location, ratio_rel),
+           x = ratio_rel,
+           fill = location == "New Delhi")) +
+  geom_col() +
+  labs(x = "Expenditure done (Rs. Crores) per annual MBBS seat") +
+  guides(fill = "none") +
+  scale_fill_manual(values = fill_scale) +
+  scale_x_continuous(expand = expansion(mult = c(0, 0.05))) +
+  cowplot::theme_minimal_vgrid() +
+  theme(
+    legend.position = "none",
+    panel.grid = element_line(linetype = 2),
+    axis.title.y = element_blank(),
+    axis.ticks.y = element_blank(),
+    axis.line.y = element_blank(),
+    plot.title.position = "plot"
+  )
+  
+g2 <- dfplot3 |> 
+  ggplot(aes(y = reorder(location, ratio_san),
+           x = ratio_san,
+           fill = location == "New Delhi")) +
+  geom_col() +
+  labs(x = "Funds Sanctioned (Rs. Crores) per annual MBBS seat") +
+  guides(fill = "none") +
+  scale_fill_manual(values = fill_scale) +
+  scale_x_continuous(expand = expansion(mult = c(0, 0.05))) +
+  cowplot::theme_minimal_vgrid() +
+  theme(
+    legend.position = "none",
+    panel.grid = element_line(linetype = 2),
+    axis.title.y = element_blank(),
+    axis.ticks.y = element_blank(),
+    axis.line.y = element_blank(),
+    plot.title.position = "plot"
+  )
+
+g1 + g2 +
+  plot_annotation(
+    title = "AIIMS Jammu & Rajkot have highest infrastructure spending (per MBBS seat)",
+    subtitle = "However, one must factor in for inflation. Most of AIIMS New Delhi funds were spent 30-40 years ago. Hence, the figures reflect partial-truth.\nAlso, sanctioned funds (right-side panel) are mere plans, awaiting implementation. The actual expenditure is a better indicator of current infrastructure."
+  ) &
+  theme(plot.title = element_text(size = 18,
+                                  face = "bold"),
+        plot.subtitle = element_text(size = 9),
+        axis.text = element_text(size = 6)) 
+```
+
+### The Complete Data (from [Rajya Sabha](https://sansad.in/rs/questions/questions-and-answers) reply)
+
+```{r}
+library(gt)
+library(gtExtras)
+df |> 
+  rename(
+    "Location" = location,
+    "State" = state,
+    "Year (Sanctioned)" = year_sanction,
+    "Faculty (Sanctioned)" = faculty_sanctioned,
+    "Faculty (in Position)" = faculty_position,
+    "MBBS Sanctioned Seats" = mbbs_sanctioned,
+    "MBBS Students (currently)" = mbbs_total,
+    "Approved Project cost (in Rs. Crore)" = project_cost_approved,
+    "Funds released/utilized (in Rs. Crore)" = funds_released,
+    "OPD patients (since May, 2019)" = opd_patients_2019_on,
+    "IPD patients (since May, 2019)" = ipd_patients_2019_on
+  ) |> 
+  select(-c(latitude, longitude, id, State)) |> 
+  gt() |> 
+  fmt_number(
+    columns = 7:10,
+    decimals = 0,
+    locale = "en-IN"
+  ) |> 
+  tab_options(
+    table.font.size = "80%"
+  ) |> 
+  opt_interactive()
+```
