@@ -18,6 +18,8 @@ sidebar: false
 
 Welcome to [FaNoOp](https://aditya-dahiya.github.io/FaNoOp/) **(Facts! Not Opinions!)**, a small corner of the internet that was born out of a simple idea -- the need for unbiased facts in a world drowning in opinions. It all started during my time at Harvard, where I couldn't help but notice the prevalence of media platforms pushing their own viewpoints.
 
-I'm Aditya Dahiya, working in Haryana, India. My days are often filled with endless files and meetings, but amidst the bureaucracy, I've found two passions: data visualization and health financing. I'm here to be your guide through the complexities of data, bureaucracy, and more, all with a hint of humor and a down-to-earth approach.
+I'm Aditya Dahiya, working in Haryana, India. My days are often filled with endless files and meetings, but amidst the bureaucracy, I've found two passions: data visualization and health financing. I'm here to be your guide through the complexities of data, bureaucracy, and more.
 
 Think of me as your companion in deciphering the world filled with complex data and paperwork, offering insights and a touch of levity along the way. I'm all about making the seemingly daunting world of facts and figures more accessible. If you're interested in some bureaucratic banter or insights into data, feel free to connect with me on [LinkedIn](https://www.linkedin.com/in/dr-aditya-dahiya-ias/) or shoot me an [email](mailto:adityadahiyaaiims@proton.me). I promise you won't get a response as formal as a government memo.
+
+You can also visit my [website](https://aditya-dahiya.github.io/), or explore my other data-driven [projects](https://aditya-dahiya.github.io/projects_presentations/projects.html).

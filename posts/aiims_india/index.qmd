@@ -3,6 +3,7 @@ title: "AIIMS Unveiled: A Visual Symphony of Numbers"
 author: "Aditya Dahiya"
 subtitle: "Unveiling the canvas of progress, our graphical odyssey unveils the quantum of faculty, students, and funding across India's new upcoming AIIMS establishments. Amidst the evolving landscape, AIIMS New Delhi still stands as a benchmark of distinction, casting a guiding light for its peers as they carve their unique paths towards academic brilliance and healthcare innovation."
 date: "2023-12-10"
+image: "logo.png"
 categories: 
  - "analysis"
  - "Government"
