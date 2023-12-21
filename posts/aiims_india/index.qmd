@@ -83,7 +83,13 @@ map <- read_sf(here(
   "India_State_Boundary.shp"
 )) |> 
   # An indicator for states with and without AIIMS
-  mutate(state_fill = State_Name %in% dfplot2$state)
+  mutate(state_fill = State_Name %in% dfplot2$state) |> 
+  # Simplifying geometry to drastically reduce plotting time
+  mutate(
+    geometry = st_simplify(geometry, 
+                           preserveTopology = FALSE, 
+                           dTolerance = 1000)
+  )
 
 # Actual Plot
 g2 <- ggplot(data = map) +
