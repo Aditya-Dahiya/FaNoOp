@@ -2,6 +2,8 @@
 title: "H1B Visas Insights Story"
 author: "Aditya Dahiya"
 editor: visual
+editor_options: 
+  chunk_output_type: console
 ---
 
 **What is H1B, and where does this data come from?**\
@@ -9,7 +11,6 @@ The H1B visa program enables U.S. companies to hire foreign workers in specializ
 
 ```{r}
 #| label: setup
-
 
 # Data Import and Wrangling Tools
 library(tidyverse)            # All things tidy
@@ -20,6 +21,7 @@ library(fontawesome)          # Icons display in ggplot2
 library(ggtext)               # Markdown text support for ggplot2
 library(showtext)             # Display fonts in ggplot2
 library(patchwork)            # Combining plots
+library(magick)               # Dealing with images
 
 library(httr)                 # Download files
 library(zip)                  # Handle ZIP files
@@ -69,4 +71,110 @@ rm(csv_file, temp_dir, temp_zip, url, url1)
 
 print(object.size(rawdf_single), units = "Mb")
 print(object.size(rawdf_multi), units = "Mb")
+
+# Getting basic fonts etc. for the entire article
+font_add_google("Ubuntu Condensed", "caption_font")
+font_add_google("Ubuntu", "body_font")
+showtext_auto()
+text_col <- "grey10"
+bg_col = "white"
+```
+
+A graph on overall data.
+
+```{r}
+
+df1 <- rawdf_single |>
+  filter(status_type == "SELECTED") |>
+  count(country_of_nationality, sort = T) |>
+  mutate(
+    country_of_nationality = fct(
+      countrycode(
+        country_of_nationality,
+        "iso3c",
+        "country.name"
+      )
+    ),
+    country_of_nationality = fct_lump_n(
+      country_of_nationality,
+      n = 10, w = n
+    )
+  ) |> 
+  group_by(country_of_nationality) |> 
+  summarise(n = sum(n)) |> 
+  drop_na() |> 
+  mutate(
+    perc = n / sum(n),
+    view_perc = perc > 0.03
+  )
+
+
+g <- df1 |> 
+  # Start Plot
+  ggplot(
+    mapping = aes(
+      x = 1,
+      y = n,
+      fill = country_of_nationality
+    )
+  ) +
+  
+  # Bar / Pie
+  geom_col(
+    colour = "white",
+    width = 0.5,
+    linewidth = 0.2
+  ) +
+  
+  # Labels for the largest countries
+  geom_text(
+    data = df1,
+    mapping = aes(
+      x = 1.5,
+      label = paste0(
+        country_of_nationality,
+        "\n(",
+        number(n),
+        ")\n",
+        percent(perc, accuracy = 0.1)
+      ),
+      size = n
+    ),
+    position = position_stack(vjust = 0.5),
+    check_overlap = TRUE,
+    family = "body_font",
+    lineheight = 0.3
+  ) +
+  scale_size(
+    range = c(1, 6)
+  ) +
+  scale_fill_manual(
+    values = c(
+      "#E31A1CFF",
+      paletteer::paletteer_d("rcartocolor::Pastel"),
+      rep("grey50", 10)
+    )
+  ) +
+  coord_radial(
+    theta = "y",
+    inner.radius = 0.5,
+    expand = FALSE
+  ) +
+  
+  theme_void(
+    base_family = "body_font",
+    base_size = 14
+  ) +
+  theme(
+    legend.position = "none"
+  )
+
+ggsave(
+  filename = here::here("posts", "h1b_visas", "fig-1.png"),
+  device = "png",
+  height = 900, width = 900, units = "px", dpi = 320,
+  bg = bg_col
+)
+
+image_read(here::here("posts", "h1b_visas", "fig-1.png"))
 ```
