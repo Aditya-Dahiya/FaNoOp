@@ -2,15 +2,68 @@
 title: "H1B Visas Insights Story"
 author: "Aditya Dahiya"
 editor: visual
+subtitle: "A deep dive into the Data on H1B Visas released by USA"
+date: "2024-10-14"
+categories: [analysis]
+image: "fig-2.png"
 editor_options: 
   chunk_output_type: console
+execute: 
+  error: false
+  message: false
+  warning: false
+  eval: false
+  echo: true
+filters:
+  - social-share
+share:
+  permalink: "https://aditya-dahiya.github.io/FaNoOp/posts/h1b_visas/"
+  description: "H1B Visas in USA - analyzing the numbers and data"
+  twitter: true
+  facebook: true
+  linkedin: true
+  email: true
+format: 
+  closeread-html:
+    code-fold: true
+    remove-header-space: true
 ---
 
-**What is H1B, and where does this data come from?**\
 The H1B visa program enables U.S. companies to hire foreign workers in specialized fields, such as technology, with visas granted via an annual lottery. A recent [Bloomberg News](https://www.bloomberg.com/graphics-v2) investigation exposed how some companies exploited the lottery system, submitting multiple applications to increase their chances. The dataset used in this analysis, covering fiscal years 2021-2024, was obtained from [U.S. Citizenship and Immigration Services (USCIS)](https://www.uscis.gov/) through a [Freedom of Information Act (FOIA)](https://www.foia.gov/) request. The detailed dataset, including information on employers, job titles, salaries, and visa petitions, can be accessed on [GitHub](https://github.com/BloombergGraphics/2024-h1b-immigration-data).
+
+::: cr-section
+Almost 60% applicants are from India, and as expected in the lottery approx 60% of all the H1B Visas go to Indians. @cr-fig1
+
+::: {#cr-fig1}
+![Most of the applicants are from India, and naturally most of the visas go to Indians.](fig-1.png){#fig-1}
+:::
+
+States in USA where the selected H1B visa applicants went to show us that most of the selected visa applicants went on to work in California or Texas. @cr-fig2
+
+::: {#cr-fig2}
+![A map of USA with number of successful visa applicants working in each state.](fig-2.png){#fig-2}
+:::
+
+Popular Cities as destinations for H1B selected Visa applicants are New York City, followed by Seattle. @cr-fig3
+
+::: {#cr-fig3}
+![Most popular cities for worksites of successful H1B Visa applicants](fig-3.png){#fig-3}
+:::
+
+Occupations Sectors related to Computers and IT dominate the field of study for successful H1B Visa Applicants. @cr-fig4
+
+::: {#cr-fig4}
+![The top 150 fields of study for the successful H1B Selected VISA Applicants](fig-4.png){#fig-4}
+:::
+:::
+
+This article and analysis is a work in progress, and new material will be added soon.
+
+The code used to prepare these graphics is given below.
 
 ```{r}
 #| label: setup
+
 
 # Data Import and Wrangling Tools
 library(tidyverse)            # All things tidy
@@ -26,6 +79,19 @@ library(magick)               # Dealing with images
 library(httr)                 # Download files
 library(zip)                  # Handle ZIP files
 library(countrycode)          # To get Country Codes
+library(sf)                   # Mapping
+
+# Getting basic fonts etc. for the entire article
+font_add_google("Ubuntu Condensed", "caption_font")
+font_add_google("Ubuntu", "body_font")
+showtext_auto()
+text_col <- "grey10"
+bg_col = "white"
+
+```
+
+```{r}
+#| label: get-data
 
 # Get Data Dictionary used by Bloomberg
 dictionary <- openxlsx::read.xlsx(
@@ -71,18 +137,11 @@ rm(csv_file, temp_dir, temp_zip, url, url1)
 
 print(object.size(rawdf_single), units = "Mb")
 print(object.size(rawdf_multi), units = "Mb")
-
-# Getting basic fonts etc. for the entire article
-font_add_google("Ubuntu Condensed", "caption_font")
-font_add_google("Ubuntu", "body_font")
-showtext_auto()
-text_col <- "grey10"
-bg_col = "white"
 ```
 
-A graph on overall data.
-
 ```{r}
+#| label: pie-chart-applicant-countries
+
 
 df1 <- rawdf_single |>
   filter(status_type == "SELECTED") |>
@@ -105,11 +164,45 @@ df1 <- rawdf_single |>
   drop_na() |> 
   mutate(
     perc = n / sum(n),
-    view_perc = perc > 0.03
+    facet_var = "H1B Visa: Selected and Granted"
   )
 
+df2 <- rawdf_single |> 
+  count(country_of_nationality, sort = T) |> 
+  mutate(
+    country_of_nationality = fct(
+      countrycode(
+        country_of_nationality,
+        "iso3c",
+        "country.name"
+      )
+    ),
+    country_of_nationality = fct_lump_n(
+      country_of_nationality,
+      n = 10, w = n
+    )
+  ) |> 
+  group_by(country_of_nationality) |> 
+  summarise(n = sum(n)) |> 
+  drop_na() |> 
+  mutate(
+    perc = n / sum(n),
+    facet_var = "Total applicants for H1B Visa"
+  )
 
-g <- df1 |> 
+bind_rows(
+  df1, df2
+) |> 
+  mutate(
+    facet_var = fct(
+      facet_var,
+      levels = c(
+        unique(df2$facet_var),
+        unique(df1$facet_var)
+      )
+    )
+  ) |> 
+  
   # Start Plot
   ggplot(
     mapping = aes(
@@ -128,7 +221,6 @@ g <- df1 |>
   
   # Labels for the largest countries
   geom_text(
-    data = df1,
     mapping = aes(
       x = 1.5,
       label = paste0(
@@ -137,16 +229,13 @@ g <- df1 |>
         number(n),
         ")\n",
         percent(perc, accuracy = 0.1)
-      ),
-      size = n
+      )
     ),
     position = position_stack(vjust = 0.5),
     check_overlap = TRUE,
     family = "body_font",
+    colour = text_col,
     lineheight = 0.3
-  ) +
-  scale_size(
-    range = c(1, 6)
   ) +
   scale_fill_manual(
     values = c(
@@ -161,20 +250,315 @@ g <- df1 |>
     expand = FALSE
   ) +
   
+  facet_wrap(~facet_var, scales = "free") +
   theme_void(
     base_family = "body_font",
     base_size = 14
   ) +
   theme(
-    legend.position = "none"
+    legend.position = "none",
+    strip.text = element_text(
+      size = 25,
+      face = "bold"
+    )
   )
 
 ggsave(
   filename = here::here("posts", "h1b_visas", "fig-1.png"),
   device = "png",
-  height = 900, width = 900, units = "px", dpi = 320,
+  height = 700, width = 1200, units = "px", dpi = 320,
   bg = bg_col
 )
 
 image_read(here::here("posts", "h1b_visas", "fig-1.png"))
+```
+
+```{r}
+#| eval: false
+#| label: us-map-locations
+
+plotdf2 <- usmapdata::us_map() |> 
+  left_join(
+    rawdf_single |> 
+      filter(status_type == "SELECTED") |> 
+      count(worksite_state, sort = T) |> 
+      drop_na() |> 
+      rename(abbr = worksite_state)
+  )
+
+plotdf3 <- plotdf2 |> 
+  st_centroid() |> 
+  mutate(
+    lon = st_coordinates(geom)[, 1], # Extract longitude
+    lat = st_coordinates(geom)[, 2]  # Extract latitude
+    ) |> 
+  mutate(
+    label_var = paste0(
+      number(n, big.mark = ","),
+      "\n(", full, ")"
+    )
+  ) |> 
+  arrange(desc(n))
+
+g <- ggplot() +
+  geom_sf(
+    data = plotdf2,
+    aes(fill = n),
+    linewidth = 0.2,
+    colour = bg_col
+  ) +
+  geom_text(
+    data = plotdf3,
+    aes(
+      x = lon, y = lat,
+      label = label_var, 
+      size = n),
+    family = "body_font",
+    fontface = "bold",
+    check_overlap = T,
+    lineheight = 0.25,
+    colour = text_col
+  ) +
+  paletteer::scale_fill_paletteer_c(
+    "grDevices::PinkYl",
+    direction = -1,
+    labels = label_number(),
+    breaks = seq(0, 16000, 4000)
+  ) +
+  scale_size(
+    range = c(3, 6)
+  ) +
+  guides(
+    size = "none"
+  ) +
+  labs(
+    fill = "Number of selected H1B Visa applicants for worksite in the state",
+  ) +
+  ggthemes::theme_map(
+    base_size = 20,
+    base_family = "body_font"
+  ) +
+  theme(
+    legend.position = "bottom",
+    legend.key.width = unit(10, "mm"),
+    legend.key.height = unit(1, "mm"),
+    plot.margin = margin(-20,0,-20,0, "mm"),
+    legend.margin = margin(-10,0,0,0, "mm"),
+    legend.title = element_text(
+      family = "caption_font",
+      margin = margin(0,0,2,0, "mm"),
+      hjust = 0.5
+    ),
+    legend.title.position = "top",
+    legend.text = element_text(
+      margin = margin(1,0,0,0, "mm")
+    ),
+    legend.justification = c(0.5, 1)
+  )
+
+ggsave(
+  filename = here::here("posts", "h1b_visas", "fig-2.png"),
+  device = "png",
+  height = 900, width = 1200, units = "px", dpi = 320,
+  bg = bg_col
+)
+
+image_read(here::here("posts", "h1b_visas", "fig-2.png"))
+```
+
+```{r}
+#| label: cities-worksites
+
+g <- rawdf_single |> 
+  count(worksite_state, worksite_city, sort = T) |> 
+  drop_na() |> 
+  mutate(worksite_city = str_to_title(worksite_city)) |> 
+  left_join(
+    usmapdata::us_map(regions = "state") |> 
+      as_tibble() |> 
+      select(abbr, full) |> 
+      rename(worksite_state = abbr)
+  ) |> 
+  slice_max(order_by = n, n = 15) |> 
+  ggplot(
+    mapping = aes(
+      y = reorder(worksite_city, n),
+      x = n
+    )
+  ) + 
+  geom_col(
+    fill = "#F3946FFF",
+    colour = "transparent"
+  ) +
+  geom_text(
+    mapping = aes(
+      label = paste0(worksite_city, ", ", full),
+      x = 10
+    ),
+    hjust = 0,
+    family = "caption_font"
+  ) +
+  geom_text(
+    mapping = aes(
+      label = number(n, big.mark = ",")
+    ),
+    nudge_x = 50,
+    hjust = 0,
+    colour = text_col,
+    family = "body_font",
+    fontface = "bold"
+  ) +
+  coord_cartesian(clip = "off") +
+  theme_void(
+    base_size = 20,
+    base_family = "body_font"
+  ) +
+  scale_x_continuous(
+    breaks = seq(0, 5000, 1000),
+    labels = seq(0, 5000, 1000),
+    expand = expansion(c(0,0.1))
+  ) +
+  labs(
+    x = "Number of successful H1B Visa applicants working in the city"
+  ) +
+  theme(
+    text = element_text(
+      colour = text_col
+    ),
+    axis.line.x = element_line(
+      linetype = 3,
+      linewidth = 0.2
+    ),
+    axis.text.x = element_text(
+      margin = margin(1,0,0,0, "mm")
+    ),
+    axis.ticks.x = element_line(
+      linetype = 1,
+      linewidth = 0.2
+    ),
+    axis.ticks.length.x = unit(0.5, "mm"),
+    axis.title.x = element_text(
+      family = "caption_font",
+      margin = margin(2,0,1,0, "mm")
+    ),
+    plot.margin = margin(2,2,2,2, "mm")
+  )
+
+
+ggsave(
+  filename = here::here("posts", "h1b_visas", "fig-3.png"),
+  device = "png",
+  height = 900, width = 900, units = "px", dpi = 320,
+  bg = bg_col
+)
+
+image_read(here::here("posts", "h1b_visas", "fig-3.png"))
+```
+
+```{r}
+#| label: field-of-study
+
+
+mypal <- paletteer::paletteer_d("khroma::stratigraphy")
+mypal <- sample(
+  mypal,
+  size = length(mypal),
+  replace = FALSE)
+
+g <- rawdf_single |> 
+  count(ben_pfield_of_study, sort = T) |> 
+  drop_na() |> 
+  mutate(
+    ben_pfield_of_study = str_to_title(ben_pfield_of_study),
+    ben_pfield_of_study = fct(ben_pfield_of_study),
+    ben_pfield_of_study = fct_lump_n(
+      ben_pfield_of_study, 
+      w = n, 
+      n = 150
+    )
+  ) |> 
+  group_by(ben_pfield_of_study) |> 
+  summarise(n = sum(n)) |> 
+  filter(ben_pfield_of_study != "Other") |> 
+  ggplot(
+    mapping = aes(
+      area = n,
+      fill = ben_pfield_of_study,
+      label = str_wrap(paste0(ben_pfield_of_study, " (", n, ")"), 10)
+    )
+  ) +
+  treemapify::geom_treemap(
+    start = "topleft",
+    alpha = 0.9,
+    colour = bg_col
+  ) +
+  treemapify::geom_treemap_text(
+    colour = text_col,
+    family = "caption_font",
+    place = "centre",
+    min.size = 2,
+    start = "topleft",
+    lineheight = 0.25
+  ) +
+  scale_fill_manual(values = mypal) +
+  theme(
+    legend.position = "none"
+  )
+
+ggsave(
+  filename = here::here("posts", "h1b_visas", "fig-4.png"),
+  device = "png",
+  height = 1500, width = 1500, units = "px", dpi = 320,
+  bg = bg_col
+)
+
+image_read(here::here("posts", "h1b_visas", "fig-4.png"))
+```
+
+```{r}
+
+
+us_zip_shp <- tigris::zctas(
+  cb = TRUE,
+  year = 2020
+)
+
+plotdf <- rawdf_single |> 
+  filter(status_type == "SELECTED") |> 
+  count(worksite_zip, sort = T) |> 
+  drop_na() |>
+  mutate(
+    zip_code = str_sub(worksite_zip, start = 1, end = 5)
+  ) |> 
+  group_by(zip_code) |> 
+  summarise(n = sum(n)) |> 
+  left_join(
+    us_zip_shp,
+    by = join_by(
+      "zip_code" == "ZCTA5CE20"
+    )
+  ) |> 
+  select(zip_code, n, geometry) |> 
+  st_as_sf() |> 
+  usmap::usmap_transform()
+  
+g <- ggplot() +
+  geom_sf(
+    data = plotdf,
+    mapping = aes(
+      fill = n
+    ),
+    colour = "transparent",
+    linewidth = 1
+  ) +
+  paletteer::scale_fill_paletteer_c(
+    "grDevices::PuBu",
+    direction = -1,
+    trans = "log10"
+    ) +
+  ggthemes::theme_map() +
+  theme(
+    legend.position = "bottom"
+  )
+
 ```
